@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Application\UseCase;
+
+use App\Domain\Enum\ActivityLogActionTypeEnum;
+use App\Domain\Repository\CustomerReadRepositoryInterface;
+use App\Domain\Repository\GroupReadRepositoryInterface;
+use App\Domain\Repository\GroupWriteRepositoryInterface;
+use App\Infrastrstructure\API\Exceptions\UserAlreadyInGroupException;
+
+readonly class AddMemberUseCase
+{
+    /**
+     * @param GroupReadRepositoryInterface $groupReadRepository
+     * @param CustomerReadRepositoryInterface $customerReadRepository
+     * @param GroupWriteRepositoryInterface $groupWriteRepository
+     * @param LogActivityUseCase $logActivityUseCase
+     */
+    public function __construct(
+        private GroupReadRepositoryInterface $groupReadRepository,
+        private CustomerReadRepositoryInterface $customerReadRepository,
+        private GroupWriteRepositoryInterface $groupWriteRepository,
+        public LogActivityUseCase $logActivityUseCase
+    ) {}
+
+    /**
+     * @throws UserAlreadyInGroupException
+     */
+    public function execute(string $groupId, int $newMemberId): void
+    {
+        if ($this->groupReadRepository->isAMemberOfGroup($groupId, $newMemberId)) {
+            throw new UserAlreadyInGroupException();
+        }
+
+        $newMember = $this->customerReadRepository->findById([$newMemberId])->first();
+
+        $group = $this->groupReadRepository->findById($groupId)->addMember($newMember);
+
+        $this->groupWriteRepository->save($group);
+
+        $this->logActivityUseCase->execute(
+            $newMemberId,
+            $group->id,
+            ActivityLogActionTypeEnum::MEMBER_ADDED_TO_GROUP
+        );
+    }
+}
