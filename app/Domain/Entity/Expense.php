@@ -17,7 +17,6 @@ class Expense
      * @param string $description
      * @param int|null $id
      * @param array $debts
-     * @param array $pays
      * @param array<Debtor> $debtors
      * @param array<Payer> $payers
      */
@@ -28,7 +27,6 @@ class Expense
         public readonly string $description,
         public ?int $id = null,
         public array $debts = [],
-        public array $pays = [],
         public array $debtors = [],
         public array $payers = []
     ) {}
@@ -40,13 +38,7 @@ class Expense
      */
     public function addPayer(Payer $payer): void
     {
-        $this->pays[] = new Pay(
-            $payer->amount,
-            $payer->currency,
-            $payer->id
-        );
-
-        $this->payers[$payer->id] = $payer;
+        $this->payers[$payer->payerId] = $payer;
     }
 
     /**
@@ -56,7 +48,7 @@ class Expense
      */
     public function addDebtor(Debtor $debtor): void
     {
-        $this->debtors[$debtor->id] = $debtor;
+        $this->debtors[$debtor->debtorId] = $debtor;
     }
 
     /**
@@ -119,7 +111,7 @@ class Expense
         $balances = [];
 
         foreach ($this->debtors as $debtor) {
-            $balances[$debtor->id] = new Balance(
+            $balances[$debtor->debtorId] = new Balance(
                 owe    : $debtor->amount,
                 paid   : 0,
                 balance: 0
@@ -127,14 +119,14 @@ class Expense
         }
 
         foreach ($this->payers as $payer) {
-            if (!isset($balances[$payer->id])) {
-                $balances[$payer->id] = new Balance(
+            if (!isset($balances[$payer->payerId])) {
+                $balances[$payer->payerId] = new Balance(
                     owe    : 0,
                     paid   : $payer->amount,
                     balance: 0
                 );
             } else {
-                $balances[$payer->id]->paid = $payer->amount;
+                $balances[$payer->payerId]->paid = $payer->amount;
             }
         }
 
@@ -154,20 +146,28 @@ class Expense
     }
 
     /**
-     * @return array<Pay>
+     * @return Payer[]
      */
-    public function getPays(): array
+    public function getPayers(): array
     {
-        return $this->pays;
+        return $this->payers;
+    }
+
+    /**
+     * @return Debtor[]
+     */
+    public function getDebtors(): array
+    {
+        return $this->debtors;
     }
 
     /**
      * @return float
      */
-    public function generalAmountOfAllPays(): float
+    public function credits(): float
     {
         $amount = 0;
-        foreach ($this->pays as $pay) {
+        foreach ($this->payers as $pay) {
             $amount = (float)bcadd((string)$amount, (string)$pay->amount);
         }
 
@@ -178,10 +178,9 @@ class Expense
     {
         $owed = 0.0;
 
-        /** @var Debt $debt */
-        foreach ($this->debts as $debt) {
-            if ($debt->from === $customerId) {
-                $owed = (float)bcadd((string)$owed, (string)$debt->amount);
+        foreach ($this->debtors as $debtor) {
+            if ($debtor->debtorId === $customerId) {
+                $owed = (float)bcadd((string)$owed, (string)$debtor->amount);
             }
         }
 
@@ -192,10 +191,9 @@ class Expense
     {
         $paid = 0.0;
 
-        /** @var Debt $debt */
-        foreach ($this->debts as $debt) {
-            if ($debt->to === $customerId) {
-                $paid = (float)bcadd((string)$paid, (string)$debt->amount);
+        foreach ($this->payers as $payer) {
+            if ($payer->payerId === $customerId) {
+                $paid = (float)bcadd((string)$paid, (string)$payer->amount);
             }
         }
 

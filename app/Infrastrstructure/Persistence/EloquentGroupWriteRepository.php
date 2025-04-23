@@ -7,7 +7,8 @@ namespace App\Infrastrstructure\Persistence;
 use App\Domain\Entity\Customer;
 use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
-use App\Models\ExpensePay;
+use App\Models\Debtor;
+use App\Models\Payer;
 use Illuminate\Support\Facades\DB;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
 
@@ -40,7 +41,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             )));
 
             foreach ($group->getExpenses() as $expense) {
-                $res = $eloquentGroup->expenses()->updateOrCreate(
+                $eloquentExpense = $eloquentGroup->expenses()->updateOrCreate(
                     ['id' => $expense->id],
                     [
                         'description'    => $expense->description,
@@ -50,7 +51,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                     ]
                 );
 
-                $expense->id = $res->id;
+                $expense->id = $eloquentExpense->id;
 
                 foreach ($expense->getDebts() as $debt) {
                     ExpenseDebt::query()->updateOrCreate(
@@ -60,20 +61,32 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                             'currency'   => $debt->currency,
                             'from'       => $debt->from,
                             'to'         => $debt->to,
-                            'expense_id' => $res->id,
+                            'expense_id' => $eloquentExpense->id,
                         ]
                     );
                 }
 
-                foreach ($expense->getPays() as $pay) {
-                    ExpensePay::query()->updateOrCreate(
-                        ['id' => $pay->id],
+                foreach ($expense->getPayers() as $payer) {
+                    Payer::query()->updateOrCreate(
+                        ['id' => $payer->id],
                         [
 
-                            'expense_id' => $res->id,
-                            'amount'     => $pay->amount,
-                            'currency'   => $pay->currency,
-                            'payer_id'   => $pay->payerId,
+                            'expense_id' => $eloquentExpense->id,
+                            'amount'     => $payer->amount,
+                            'currency'   => $payer->currency,
+                            'payer_id'   => $payer->payerId,
+                        ]
+                    );
+                }
+
+                foreach ($expense->getDebtors() as $debtor) {
+                    Debtor::query()->updateOrCreate(
+                        ['id' => $debtor->id],
+                        [
+                            'expense_id' => $eloquentExpense->id,
+                            'amount'     => $debtor->amount,
+                            'debtor_id'  => $debtor->debtorId,
+                            'currency'   => $debtor->currency,
                         ]
                     );
                 }
@@ -82,14 +95,16 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             if ($group->simplifyDebts) {
                 $distributedDebts = $group->distributeDebts();
                 $eloquentGroup->debts()->delete();
+                $eloquentGroup->expenses->each(fn ($expense) => $expense->debts()->delete());
+
                 $insert = [];
                 foreach ($distributedDebts as $debt) {
                     $insert[] = [
-                        'amount'     => $debt->amount,
-                        'currency'   => $debt->currency,
-                        'from'       => $debt->from,
-                        'to'         => $debt->to,
-                        'expense_id' => $res->id,
+                        'amount'   => $debt->amount,
+                        'currency' => $debt->currency,
+                        'from'     => $debt->from,
+                        'to'       => $debt->to,
+                        'group_id' => $eloquentGroup->id,
                     ];
                 }
                 ExpenseDebt::query()->insert($insert);

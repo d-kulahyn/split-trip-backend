@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Domain\Entity;
 
 use App\Domain\Enum\DebtStatusEnum;
+use App\Domain\Exception\GroupHasDebtsException;
+use App\Domain\Repository\GroupWriteRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use App\Domain\Services\DebtDistributor;
 
@@ -19,6 +21,7 @@ class Group
      * @param bool $simplifyDebts
      * @param string|null $id
      * @param string|null $avatar
+     * @param array $debts
      * @param array $members
      * @param array $expenses
      */
@@ -30,6 +33,7 @@ class Group
         public bool $simplifyDebts = true,
         public ?string $id = null,
         public ?string $avatar = null,
+        public array $debts = [],
         private array $members = [],
         private array $expenses = [],
     ) {}
@@ -195,6 +199,34 @@ class Group
     }
 
     /**
+     * @param int $customerId
+     *
+     * @return Balance
+     */
+    public function getMyGeneralStatistic(int $customerId): Balance
+    {
+        $balance = new Balance();
+
+        foreach ($this->getExpenses() as $expense) {
+            foreach($expense->getPayers() as $payer) {
+                if ($payer->payerId === $customerId) {
+                    $balance->paid = (float)bcadd((string)$balance->paid, (string)$payer->amount);
+                }
+            }
+
+            foreach($expense->getDebtors() as $debtor) {
+                if ($debtor->debtorId === $customerId) {
+                    $balance->owe = (float)bcadd((string)$balance->owe, (string)$debtor->amount);
+                }
+            }
+        }
+
+        $balance->balance = (float)bcsub((string)$balance->paid, (string)$balance->owe);
+
+        return $balance;
+    }
+
+    /**
      * @return array<Debt>
      */
     public function getDebts(): array
@@ -207,7 +239,7 @@ class Group
             }
         }
 
-        return $debts;
+        return array_merge($this->debts, $debts);
     }
 
     /**
@@ -224,5 +256,18 @@ class Group
         }
 
         return null;
+    }
+
+    /**
+     * @throws GroupHasDebtsException
+     */
+    public function remove(): bool
+    {
+        if (!empty($this->getDebts())) throw new GroupHasDebtsException();
+
+        /** @var GroupWriteRepositoryInterface $groupWriteRepository */
+        $groupWriteRepository = app(GroupWriteRepositoryInterface::class);
+
+        return $groupWriteRepository->remove($this);
     }
 }

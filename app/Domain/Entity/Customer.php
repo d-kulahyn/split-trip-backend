@@ -25,6 +25,7 @@ class Customer
      * @param string|null $name
      * @param string|null $avatar
      * @param int|null $id
+     * @param Balance|null $balance
      * @param string|null $currency
      */
     public function __construct(
@@ -41,7 +42,8 @@ class Customer
         public ?string $name = null,
         public ?string $avatar = null,
         public ?int $id = null,
-        public ?string $currency = null
+        public ?string $currency = null,
+        public ?Balance $balance = null
     ) {}
 
     /**
@@ -65,10 +67,24 @@ class Customer
     }
 
     /**
+     * @param Balance $balance
+     *
+     * @return void
+     */
+    public function setBalance(Balance $balance): void
+    {
+        $this->balance = $balance;
+    }
+
+    /**
      * @return Balance
      */
     public function getBalance(): Balance
     {
+        if ($this->balance) {
+            return $this->balance;
+        }
+
         $customerReadRepository = app(CustomerReadRepositoryInterface::class);
         $currencyConverterService = app(CurrencyConverterService::class);
 
@@ -97,6 +113,8 @@ class Customer
                 $generalBalance->balance = (float)bcadd((string)$generalBalance->balance, (string)$balance->balance);
             }
         }
+
+        $this->balance = $generalBalance;
 
         return $generalBalance;
     }

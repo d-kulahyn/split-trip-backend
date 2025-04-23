@@ -64,11 +64,11 @@ class Group extends Model
     }
 
     /**
-     * @return HasManyThrough
+     * @return HasMany
      */
-    public function debts(): HasManyThrough
+    public function debts(): HasMany
     {
-        return $this->hasManyThrough(ExpenseDebt::class, Expense::class, 'group_id', 'expense_id', 'id', 'id');
+        return $this->hasMany(ExpenseDebt::class);
     }
 
     /**

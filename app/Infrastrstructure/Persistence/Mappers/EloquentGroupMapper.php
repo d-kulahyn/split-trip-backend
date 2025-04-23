@@ -11,7 +11,6 @@ use App\Domain\Entity\Payer;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\ExpenseDebt;
-use App\Models\ExpensePay;
 
 class EloquentGroupMapper
 {
@@ -29,6 +28,16 @@ class EloquentGroupMapper
             finalCurrency: $group->final_currency,
             simplifyDebts: $group->simplify_debts,
             id           : $group->id,
+            debts        : $group->debts->map(function (ExpenseDebt $debt) {
+                return new Debt(
+                    amount  : (float)$debt->amount,
+                    currency: $debt->currency,
+                    from    : $debt->from,
+                    to      : $debt->to,
+                    status  : $debt->status,
+                    id      : $debt->id
+                );
+            })->toArray(),
             members      : $group->members->map(function (Customer $customer) {
                 return new \App\Domain\Entity\Customer(
                     password: $customer->password,
@@ -53,18 +62,24 @@ class EloquentGroupMapper
                             id      : $expenseDebt->id,
                         );
                     })->toArray(),
-                    debtors    : $expense->debts->map(function (ExpenseDebt $expenseDebt) {
+                    debtors    : $expense->debtors->map(function (\App\Models\Debtor $debtor) {
                         return new Debtor(
-                            id    : $expenseDebt->from,
-                            amount: (float)$expenseDebt->amount,
+                            amount  : $debtor->amount,
+                            debtorId: $debtor->debtor_id,
+                            currency: $debtor->currency,
+                            id      : $debtor->id,
+                            name    : $debtor->customer->name,
+                            avatar  : $debtor->customer->avatar,
                         );
                     })->toArray(),
-                    payers     : $expense->pays->map(function (ExpensePay $expensePay) {
+                    payers     : $expense->payers->map(function (\App\Models\Payer $payer) {
                         return new Payer(
-                            id      : $expensePay->payer_id,
-                            amount  : (float)$expensePay->amount,
-                            currency: $expensePay->currency,
-                            avatar  : $expensePay->customer->avatar
+                            amount  : $payer->amount,
+                            currency: $payer->currency,
+                            payerId : $payer->payer_id,
+                            id      : $payer->id,
+                            avatar  : $payer->customer->avatar,
+                            name    : $payer->customer->name
                         );
                     })->toArray(),
                 );

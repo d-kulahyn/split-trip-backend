@@ -17,14 +17,15 @@ use App\Infrastrstructure\API\DTO\RequestGroupDTO;
 use App\Infrastrstructure\API\Exceptions\UnauthorizedGroupActionException;
 use App\Infrastrstructure\API\Exceptions\UserAlreadyInGroupException;
 use App\Infrastrstructure\API\Resource\CustomerResource;
-use App\Infrastrstructure\API\Resource\ExpenseResource;
 use App\Infrastrstructure\API\Resource\GroupResource;
+use App\Infrastrstructure\Mapper\GroupEloquentToDomainEntity;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 readonly class GroupController
@@ -128,7 +129,7 @@ readonly class GroupController
             return response()->json(['message' => $e->getMessage()], ResponseAlias::HTTP_FORBIDDEN);
         }
 
-        return response(new ExpenseResource($expense), ResponseAlias::HTTP_CREATED);
+        return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -168,6 +169,21 @@ readonly class GroupController
         return new GroupResource($this->groupReadRepository->findById($group->id));
     }
 
+    /**
+     * @param Group $group
+     *
+     * @return JsonResponse
+     */
+    public function delete(Group $group): JsonResponse
+    {
+        try {
+            GroupEloquentToDomainEntity::toEntity($group)->remove();
+        } catch (\Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], ResponseAlias::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json(['message' => 'Group deleted successfully'], ResponseAlias::HTTP_OK);
+    }
 
     /**
      * @param Group $group
@@ -176,10 +192,13 @@ readonly class GroupController
      */
     public function uploadAvatar(Group $group): JsonResponse
     {
-        // Validate the request
-        request()->validate([
+        $validator = Validator::make(request()->all(), [
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], ResponseAlias::HTTP_BAD_REQUEST);
+        }
 
         $file = request()->file('avatar');
 

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Infrastrstructure\API\Resource;
 
-use App\Domain\Entity\Payer;
+use App\Domain\Entity\Debtor;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
-class PayerResource extends JsonResource
+class DebtorResource extends JsonResource
 {
 
     public function toArray($request): array
     {
-        /** @var Payer $resource */
+        /** @var Debtor $resource */
         $resource = $this->resource;
 
         return [

@@ -49,18 +49,26 @@ readonly class AddExpenseUseCase
             }
 
             $expense = new Expense(
-                $expenseDTO->category,
-                $expenseDTO->created_at,
-                $expenseDTO->currency,
-                $expenseDTO->description,
+                category: $expenseDTO->category,
+                createdAt: $expenseDTO->created_at,
+                currency: $expenseDTO->currency,
+                description: $expenseDTO->description,
             );
 
             foreach ($expenseDTO->debtors as $debtor) {
-                $expense->addDebtor(new Debtor($debtor->id, $debtor->amount));
+                $expense->addDebtor(new Debtor(
+                    amount  : $debtor->amount,
+                    debtorId: $debtor->id,
+                    currency: $expenseDTO->currency,
+                ));
             }
 
             foreach ($expenseDTO->payers as $payer) {
-                $expense->addPayer(new Payer($payer->id, $payer->amount, $payer->currency));
+                $expense->addPayer(new Payer(
+                    amount  : $payer->amount,
+                    currency: $payer->currency,
+                    payerId : $payer->id
+                ));
             }
 
             $expense->distributeDebts($this->currencyConverterService, $group->finalCurrency);

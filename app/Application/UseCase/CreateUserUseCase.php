@@ -33,6 +33,8 @@ readonly class CreateUserUseCase
         return DB::transaction(function () use ($createUserDTO) {
             $createUserDTO->password = $this->passwordEncoder->hash($createUserDTO->password);
 
+            $createUserDTO->name = explode('@', $createUserDTO->email)[0];
+
             $customerId = $this->customerWriteRepository->save(CreateCustomerDTOToDomainEntity::toEntity($createUserDTO));
 
             $this->sendConfirmationCodeToCustomerUseCase->execute($createUserDTO->email);

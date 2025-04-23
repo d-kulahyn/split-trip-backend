@@ -7,15 +7,19 @@ namespace App\Domain\Entity;
 class Payer
 {
     /**
-     * @param int $id
      * @param float $amount
      * @param string $currency
+     * @param int $payerId
+     * @param int|null $id
      * @param string|null $avatar
+     * @param string|null $name
      */
     public function __construct(
-        public int $id,
         public float $amount,
         public string $currency,
-        public ?string $avatar = null
+        public int $payerId,
+        public ?int $id = null,
+        public ?string $avatar = null,
+        public ?string $name = null,
     ) {}
 }

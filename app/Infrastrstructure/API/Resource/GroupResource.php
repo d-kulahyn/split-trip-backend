@@ -6,10 +6,10 @@ namespace App\Infrastrstructure\API\Resource;
 
 use App\Domain\Entity\Debt;
 use App\Domain\Entity\Group;
+use App\Domain\Repository\CurrencyReadRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
-use App\Domain\Repository\CurrencyReadRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 
 class GroupResource extends JsonResource
@@ -32,25 +32,20 @@ class GroupResource extends JsonResource
         $balances = $resource->hasMembers() ? array_map(function (Balance $balance, int $customerId) use (
             $customers
         ) {
-            return [
-                'owe'       => $balance->owe,
-                'paid'       => $balance->paid,
-                'balance'    => $balance->balance,
-                'customer'   => new CustomerResource($customers[$customerId]),
-                'customerId' => $customerId,
+            $customers[$customerId]->setBalance($balance);
 
-            ];
+            return new CustomerResource($customers[$customerId]);
         }, $resource->getBalances(), array_keys($resource->getBalances())) : [];
 
-        usort($balances, function ($a, $b) {
-            if ($a['customerId'] == auth()->id()) {
+        usort($balances, function (CustomerResource $a, CustomerResource $b) {
+            if ($a->resource->id == auth()->id()) {
                 return -1;
             }
-            if ($b['customerId'] == auth()->id()) {
+            if ($b->resource->id == auth()->id()) {
                 return 1;
             }
 
-            return $b['balance'] <=> $a['balance'];
+            return $b->resource->getBalance()->balance <=> $a->resource->getBalance()->balance;
         });
 
         $debts = $resource->hasMembers() ? array_map(function (Debt $debt) use ($customers) {
@@ -83,12 +78,13 @@ class GroupResource extends JsonResource
             'members'        => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
             'currencies'     => $currencyReadRepository->codes(),
             'expenses'       => ExpenseResource::collection($resource->getExpenses()),
-            'myBalance'      => $resource->getBalances()[auth()->id()] ?? new Balance(),
+            'myBalance'      => $resource->getMyGeneralStatistic(auth()->id()),
             'simplify_debts' => $resource->simplifyDebts,
             'balances'       => $balances,
             'debts'          => $debts,
             'rates'          => $currencyReadRepository->rates($resource->finalCurrency),
             'avatar'         => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
+            'overallBalance' => $customers[auth()->id()]->getBalance(),
         ];
     }
 }

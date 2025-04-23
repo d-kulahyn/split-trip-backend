@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ExpensePay extends Model
+class Payer extends Model
 {
     use HasFactory;
 
     /**
      * @var string
      */
-    protected $table = 'expense_pays';
+    protected $table = 'expense_payers';
 
     /**
      * @var string[]
@@ -23,6 +23,10 @@ class ExpensePay extends Model
         'amount',
         'currency',
         'payer_id',
+    ];
+
+    protected $casts = [
+        'amount' => 'float',
     ];
 
     public function customer(): BelongsTo

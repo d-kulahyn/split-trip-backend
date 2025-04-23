@@ -19,14 +19,15 @@ class ExpenseResource extends JsonResource
 
         return [
             'id'                     => $resource->id,
-            'owe'                   => $resource->owe($request->user()->id),
+            'owe'                    => $resource->owe($request->user()->id),
             'paid'                   => $resource->paid($request->user()->id),
             'description'            => $resource->description,
             'currency'               => $resource->currency,
             'created_at'             => $resource->createdAt,
             'category'               => $resource->category,
             'payers'                 => PayerResource::collection($resource->payers),
-            'generalAmountOfAllPays' => $resource->generalAmountOfAllPays(),
+            'debtors'                => DebtorResource::collection($resource->debtors),
+            'generalAmountOfAllPays' => $resource->credits(),
         ];
     }
 }

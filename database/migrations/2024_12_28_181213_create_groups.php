@@ -43,20 +43,21 @@ return new class extends Migration
 
         Schema::create('expense_debts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('expense_id')->nullable(false);
             $table->float('amount')->nullable(false);
             $table->string('currency')->nullable(false);
             $table->unsignedInteger('from')->nullable(false);
+            $table->unsignedInteger('expense_id')->nullable()->default(null);
             $table->unsignedInteger('to')->nullable(false);
             $table->string('status')->nullable(false)->default(\App\Domain\Enum\DebtStatusEnum::PENDING->value);
             $table->timestamps();
 
+            $table->foreignUuid('group_id')->constrained()->onDelete('cascade');
             $table->foreign('expense_id')->references('id')->on('expenses')->onDelete('cascade');
             $table->foreign('from')->references('id')->on('customers')->onDelete('cascade');
             $table->foreign('to')->references('id')->on('customers')->onDelete('cascade');
         });
 
-        Schema::create('expense_pays', function (Blueprint $table) {
+        Schema::create('expense_payers', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('expense_id')->nullable(false);
             $table->float('amount')->nullable(false);
@@ -67,6 +68,18 @@ return new class extends Migration
             $table->foreign('expense_id')->references('id')->on('expenses')->onDelete('cascade');
             $table->foreign('payer_id')->references('id')->on('customers')->onDelete('cascade');
         });
+
+        Schema::create('expense_debtors', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('expense_id')->nullable(false);
+            $table->unsignedInteger('debtor_id')->nullable(false);
+            $table->string('currency')->nullable(false);
+            $table->float('amount')->nullable(false);
+            $table->timestamps();
+
+            $table->foreign('expense_id')->references('id')->on('expenses')->onDelete('cascade');
+            $table->foreign('debtor_id')->references('id')->on('customers')->onDelete('cascade');
+        });
     }
 
     /**
@@ -74,8 +87,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('groups');
-        Schema::dropIfExists('customer_group');
+        Schema::dropIfExists('group_debts');
+        Schema::dropIfExists('expense_payers');
+        Schema::dropIfExists('expense_debtors');
         Schema::dropIfExists('expenses');
+        Schema::dropIfExists('customer_group');
+        Schema::dropIfExists('groups');
     }
 };

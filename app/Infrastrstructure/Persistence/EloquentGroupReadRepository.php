@@ -63,7 +63,8 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
         $paginator = Group::query()
             ->with([
                 'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
-                'members'
+                'members',
+                'debts'
             ])
             ->where(function ($query) use ($customerId) {
                 $query->where('created_by', $customerId)

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('groups')->group(function () {
     Route::post('/', [GroupController::class, 'createGroup']);
     Route::put('/{group}', [GroupController::class, 'updateGroup'])->middleware('can:update,group');
+    Route::delete('/{group}', [GroupController::class, 'delete'])->middleware('can:delete,group');
     Route::post('/{group}/avatar', [GroupController::class, 'uploadAvatar']);
     Route::put('/{group}/simplifyDebts', [GroupController::class, 'toggleSimplify'])->middleware('can:update,group');
     Route::get('/', [GroupController::class, 'list']);

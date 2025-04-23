@@ -20,12 +20,13 @@ class ExpenseDebt extends Model
      * @var string[]
      */
     protected $fillable = [
-        'expense_id',
         'amount',
         'currency',
         'to',
         'from',
         'status',
+        'expense_id',
+        'group_id',
     ];
 
     /**

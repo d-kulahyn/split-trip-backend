@@ -19,4 +19,15 @@ class GroupPolicy
     {
         return $customer->id === $group->created_by;
     }
+
+    /**
+     * @param Customer $customer
+     * @param Group $group
+     *
+     * @return bool
+     */
+    public function delete(Customer $customer, Group $group): bool
+    {
+        return $customer->id === $group->created_by;
+    }
 }

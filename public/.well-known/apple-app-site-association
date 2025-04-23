@@ -4,7 +4,7 @@
     "details": [
       {
         "appIDs": [
-          "GB4A2AGTU2.com.example.splitTrip"
+          "5566P769GD.com.example.splitTrip"
         ],
         "paths": [
           "*"
@@ -19,7 +19,7 @@
   },
   "webcredentials": {
     "apps": [
-      "GB4A2AGTU2.com.example.splitTrip"
+      "5566P769GD.com.example.splitTrip"
     ]
   }
 }

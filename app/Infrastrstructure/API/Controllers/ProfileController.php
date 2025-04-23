@@ -12,6 +12,8 @@ use App\Application\UseCase\UpdateCustomerUseCase;
 use App\Infrastrstructure\API\DTO\UpdateCustomerDTO;
 use App\Infrastrstructure\API\DTO\UpdateCustomerPasswordDTO;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 readonly class ProfileController
 {
@@ -71,10 +73,13 @@ readonly class ProfileController
      */
     public function uploadAvatar(): JsonResponse
     {
-        // Validate the request
-        request()->validate([
+        $validator = Validator::make(request()->all(), [
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], Response::HTTP_BAD_REQUEST);
+        }
 
         $file = request()->file('avatar');
 

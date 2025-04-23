@@ -25,7 +25,7 @@ class Expense extends Model
         'category',
         'group_id',
         'created_at',
-        'final_currency'
+        'final_currency',
     ];
 
     /**
@@ -36,14 +36,19 @@ class Expense extends Model
         return $this->belongsTo(Group::class);
     }
 
-    public function pays(): HasMany
+    public function payers(): HasMany
     {
-        return $this->hasMany(ExpensePay::class);
+        return $this->hasMany(Payer::class);
     }
 
     public function debts(): HasMany
     {
         return $this->hasMany(ExpenseDebt::class);
+    }
+
+    public function debtors(): HasMany
+    {
+        return $this->hasMany(Debtor::class);
     }
 
     public function group(): BelongsTo
