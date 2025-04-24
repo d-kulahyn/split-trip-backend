@@ -8,18 +8,8 @@
         ],
         "paths": [
           "*"
-        ],
-        "components": [
-          {
-            "/": "/*"
-          }
         ]
       }
-    ]
-  },
-  "webcredentials": {
-    "apps": [
-      "5566P769GD.com.example.splitTrip"
     ]
   }
 }
