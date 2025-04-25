@@ -111,7 +111,7 @@ readonly class GroupController
 
             return response()->json(['message' => 'Member added successfully'], ResponseAlias::HTTP_CREATED);
         } catch (UserAlreadyInGroupException $e) {
-            return response()->json(['error' => $e->getMessage()], ResponseAlias::HTTP_BAD_REQUEST);
+            return response()->json(['error' => $e->getMessage()], ResponseAlias::HTTP_CONFLICT);
         }
     }
 
