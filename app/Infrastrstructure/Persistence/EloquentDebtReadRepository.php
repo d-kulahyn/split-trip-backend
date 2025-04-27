@@ -13,20 +13,20 @@ class EloquentDebtReadRepository implements DebtReadRepositoryInterface
 
     public function findById(int $id): ?Debt
     {
-        $debt = Debt::query()->find($id);
+        $debt = ExpenseDebt::query()->find($id);
 
         if ($debt === null) {
             return null;
         }
 
         return new Debt(
-            amount: (float)$debt->amount,
+            amount  : (float)$debt->amount,
             currency: $debt->currency,
-            from: $debt->from,
-            to: $debt->to,
-            status: $debt->status,
-            groupId: $debt->group_id,
-            id: $debt->id,
+            groupId : $debt->group_id,
+            from    : $debt->from,
+            to      : $debt->to,
+            status  : $debt->status,
+            id      : $debt->id,
         );
     }
 }
