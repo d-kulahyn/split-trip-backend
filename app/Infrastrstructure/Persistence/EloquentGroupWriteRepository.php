@@ -34,7 +34,6 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             );
 
             $group->id = (string)$eloquentGroup->id;
-
             $eloquentGroup->members()->sync(array_values(array_map(
                 fn(Customer $customer) => $customer->id,
                 $group->getMembers()
@@ -104,7 +103,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                         'currency' => $debt->currency,
                         'from'     => $debt->from,
                         'to'       => $debt->to,
-                        'group_id' => $eloquentGroup->id,
+                        'group_id' => $group->id,
                     ];
                 }
                 ExpenseDebt::query()->insert($insert);
