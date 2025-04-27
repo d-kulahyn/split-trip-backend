@@ -34,6 +34,7 @@ class GroupEloquentToDomainEntity
                 return new Debt(
                     amount  : (float)$debt->amount,
                     currency: $debt->currency,
+                    groupId : $debt->group_id,
                     from    : $debt->from,
                     to      : $debt->to,
                     status  : $debt->status,
@@ -62,6 +63,7 @@ class GroupEloquentToDomainEntity
                         return new Debt(
                             amount  : (float)$debt->amount,
                             currency: $debt->currency,
+                            groupId : $debt->group_id,
                             from    : $debt->from,
                             to      : $debt->to,
                             status  : $debt->status,
