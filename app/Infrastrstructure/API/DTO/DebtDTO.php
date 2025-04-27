@@ -23,7 +23,7 @@ class DebtDTO extends Data
     public static function rules(...$args): array
     {
         return [
-            'amount' => 'required|float|min:0.01|max:99999999.99',
+            'amount' => 'required|numeric|min:0.01|max:99999999.99',
         ];
     }
 }
