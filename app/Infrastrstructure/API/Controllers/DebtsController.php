@@ -23,6 +23,7 @@ readonly class DebtsController
      * @param ExpenseDebt $debt
      * @param DebtDTO $debtDTO
      *
+     * @throws \App\Application\DebtException
      * @return JsonResponse
      */
     public function update(ExpenseDebt $debt, DebtDTO $debtDTO): JsonResponse
