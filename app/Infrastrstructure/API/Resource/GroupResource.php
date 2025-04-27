@@ -70,6 +70,13 @@ class GroupResource extends JsonResource
             return $b['amount'] <=> $a['amount'];
         });
 
+        $myBalance = array_filter(
+            $balances,
+            function (CustomerResource $customer) {
+                return $customer->resource->id === auth()->id();
+            }
+        );
+
         return [
             'id'             => $resource->id,
             'name'           => $resource->name,
@@ -79,7 +86,7 @@ class GroupResource extends JsonResource
             'members'        => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
             'currencies'     => $currencyReadRepository->codes(),
             'expenses'       => ExpenseResource::collection($resource->getExpenses()),
-            'myBalance'      => $resource->getMyGeneralStatistic(auth()->id()),
+            'myBalance'      => $myBalance,
             'simplify_debts' => $resource->simplifyDebts,
             'balances'       => $balances,
             'debts'          => $debts,
