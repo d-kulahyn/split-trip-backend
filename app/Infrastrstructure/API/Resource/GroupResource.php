@@ -75,7 +75,7 @@ class GroupResource extends JsonResource
             function (CustomerResource $customer) {
                 return $customer->resource->id === auth()->id();
             }
-        );
+        )[0];
 
         return [
             'id'             => $resource->id,
