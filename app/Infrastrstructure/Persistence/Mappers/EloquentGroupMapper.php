@@ -32,10 +32,11 @@ class EloquentGroupMapper
                 return new Debt(
                     amount  : (float)$debt->amount,
                     currency: $debt->currency,
+                    groupId : $debt->group_id,
                     from    : $debt->from,
                     to      : $debt->to,
                     status  : $debt->status,
-                    id      : $debt->id
+                    id      : $debt->id,
                 );
             })->toArray(),
             members      : $group->members->map(function (Customer $customer) {
@@ -56,6 +57,7 @@ class EloquentGroupMapper
                         return new Debt(
                             amount  : (float)$expenseDebt->amount,
                             currency: $expenseDebt->currency,
+                            groupId : $expenseDebt->group_id,
                             from    : $expenseDebt->from,
                             to      : $expenseDebt->to,
                             status  : $expenseDebt->status,
