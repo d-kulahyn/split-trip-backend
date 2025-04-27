@@ -61,6 +61,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                             'from'       => $debt->from,
                             'to'         => $debt->to,
                             'expense_id' => $eloquentExpense->id,
+                            'group_id'   => $eloquentGroup->id,
                         ]
                     );
                 }
@@ -94,7 +95,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             if ($group->simplifyDebts) {
                 $distributedDebts = $group->distributeDebts();
                 $eloquentGroup->debts()->delete();
-                $eloquentGroup->expenses->each(fn ($expense) => $expense->debts()->delete());
+                $eloquentGroup->expenses->each(fn($expense) => $expense->debts()->delete());
 
                 $insert = [];
                 foreach ($distributedDebts as $debt) {
