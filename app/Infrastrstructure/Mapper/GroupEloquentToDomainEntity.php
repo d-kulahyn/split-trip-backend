@@ -58,6 +58,7 @@ class GroupEloquentToDomainEntity
                     createdAt  : $expense->created_at->timestamp,
                     currency   : $expense->final_currency,
                     description: $expense->description,
+                    groupId    : $expense->group_id,
                     id         : $expense->id,
                     debts      : $expense->debts->map(function (ExpenseDebt $debt) {
                         return new Debt(

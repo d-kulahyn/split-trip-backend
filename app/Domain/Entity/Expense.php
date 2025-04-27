@@ -15,16 +15,18 @@ class Expense
      * @param int $createdAt
      * @param string $currency
      * @param string $description
+     * @param string $groupId
      * @param int|null $id
      * @param array $debts
-     * @param array<Debtor> $debtors
-     * @param array<Payer> $payers
+     * @param array $debtors
+     * @param array $payers
      */
     public function __construct(
         public readonly string $category,
         public readonly int $createdAt,
         public readonly string $currency,
         public readonly string $description,
+        public readonly string $groupId,
         public ?int $id = null,
         public array $debts = [],
         public array $debtors = [],
@@ -67,7 +69,7 @@ class Expense
         /** @var DebtDistributor $debtsDistributor */
         $debtsDistributor = app(DebtDistributor::class);
 
-        $this->debts = $debtsDistributor->distributeDebts($balances, $this->currency);
+        $this->debts = $debtsDistributor->distributeDebts($balances, $this->currency, $this->groupId);
 
         return $this->debts;
     }

@@ -13,10 +13,11 @@ class DebtDistributor
     /**
      * @param Collection $balances
      * @param string $currency
+     * @param string $groupId
      *
      * @return array
      */
-    public function distributeDebts(Collection $balances, string $currency): array
+    public function distributeDebts(Collection $balances, string $currency, string $groupId): array
     {
         $debts = [];
 
@@ -44,6 +45,7 @@ class DebtDistributor
                 $debts[] = new Debt(
                     $amount,
                     $currency,
+                    $groupId,
                     $debtorId,
                     $payerId,
                 );

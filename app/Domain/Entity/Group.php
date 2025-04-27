@@ -195,7 +195,7 @@ class Group
         /** @var DebtDistributor $debtsDistributor */
         $debtsDistributor = app(DebtDistributor::class);
 
-        return $debtsDistributor->distributeDebts($balances, $this->finalCurrency);
+        return $debtsDistributor->distributeDebts($balances, $this->finalCurrency, $this->id);
     }
 
     /**

@@ -49,10 +49,11 @@ readonly class AddExpenseUseCase
             }
 
             $expense = new Expense(
-                category: $expenseDTO->category,
-                createdAt: $expenseDTO->created_at,
-                currency: $expenseDTO->currency,
+                category   : $expenseDTO->category,
+                createdAt  : $expenseDTO->created_at,
+                currency   : $expenseDTO->currency,
                 description: $expenseDTO->description,
+                groupId    : $group->id,
             );
 
             foreach ($expenseDTO->debtors as $debtor) {
