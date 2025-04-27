@@ -5,18 +5,22 @@ declare(strict_types=1);
 namespace App\Infrastrstructure\API\Controllers;
 
 use App\Application\UseCase\UpdateDebtUseCase;
+use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\API\DTO\DebtDTO;
+use App\Infrastrstructure\API\Resource\GroupResource;
 use App\Models\ExpenseDebt;
-use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 readonly class DebtsController
 {
     /**
      * @param UpdateDebtUseCase $updateDebtStatusUseCase
+     * @param GroupReadRepositoryInterface $groupReadRepository
      */
     public function __construct(
-        protected UpdateDebtUseCase $updateDebtStatusUseCase
+        protected UpdateDebtUseCase $updateDebtStatusUseCase,
+        protected GroupReadRepositoryInterface $groupReadRepository,
     ) {}
 
     /**
@@ -24,12 +28,12 @@ readonly class DebtsController
      * @param DebtDTO $debtDTO
      *
      * @throws \App\Application\DebtException
-     * @return JsonResponse
+     * @return Response
      */
-    public function update(ExpenseDebt $debt, DebtDTO $debtDTO): JsonResponse
+    public function update(ExpenseDebt $debt, DebtDTO $debtDTO): Response
     {
         $this->updateDebtStatusUseCase->execute($debt->id, $debtDTO);
 
-        return response()->json(['id' => 'Debt status updated successfully'], Response::HTTP_OK);
+        return response(new GroupResource($this->groupReadRepository->findById($debt->group_id)), ResponseAlias::HTTP_CREATED);
     }
 }
