@@ -52,6 +52,7 @@ class EloquentGroupMapper
                     createdAt  : $expense->created_at->timestamp,
                     currency   : $expense->final_currency,
                     description: $expense->description,
+                    groupId    : $expense->group_id,
                     id         : $expense->id,
                     debts      : $expense->debts->map(function (ExpenseDebt $expenseDebt) {
                         return new Debt(
