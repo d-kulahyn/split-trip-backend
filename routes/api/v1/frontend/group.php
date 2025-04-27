@@ -20,5 +20,5 @@ Route::prefix('groups')->group(function () {
 });
 
 Route::prefix('debts')->group(function () {
-    Route::put('/{debt}', [DebtsController::class, 'changeStatus'])->middleware('can:update,debt');
+    Route::put('/{debt}', [DebtsController::class, 'update'])->middleware('can:update,debt');
 });

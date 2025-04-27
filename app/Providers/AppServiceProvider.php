@@ -12,6 +12,7 @@ use App\Domain\Repository\DebtReadRepositoryInterface;
 use App\Domain\Repository\DebtWriteRepositoryInterface;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
+use App\Domain\Repository\TransactionWriteRepositoryInterface;
 use App\Infrastrstructure\Persistence\EloquentActivityLogWriteWriteRepository;
 use App\Infrastrstructure\Persistence\EloquentCustomerReadRepository;
 use App\Infrastrstructure\Persistence\EloquentCustomerWriteRepository;
@@ -19,6 +20,7 @@ use App\Infrastrstructure\Persistence\EloquentDebtReadRepository;
 use App\Infrastrstructure\Persistence\EloquentDebtWriteRepository;
 use App\Infrastrstructure\Persistence\EloquentGroupReadRepository;
 use App\Infrastrstructure\Persistence\EloquentGroupWriteRepository;
+use App\Infrastrstructure\Persistence\EloquentTransactionWriteRepository;
 use App\Infrastrstructure\Persistence\ExchangeRateApiCurrencyReadRepository;
 use App\Infrastrstructure\Service\Interface\SecurityCodeStorageInterface;
 use App\Infrastrstructure\Service\SecurityCodeRedisStorage;
@@ -57,6 +59,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DebtReadRepositoryInterface::class, EloquentDebtReadRepository::class);
 
         $this->app->bind(ActivityWriteRepositoryInterface::class, EloquentActivityLogWriteWriteRepository::class);
+
+        $this->app->bind(TransactionWriteRepositoryInterface::class, EloquentTransactionWriteRepository::class);
 
         $this->app->bind(Factory::class, function (Application $app) {
             return (new Factory())->withServiceAccount($app->basePath('firebase.json'));

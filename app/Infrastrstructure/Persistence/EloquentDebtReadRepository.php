@@ -25,6 +25,7 @@ class EloquentDebtReadRepository implements DebtReadRepositoryInterface
             from: $debt->from,
             to: $debt->to,
             status: $debt->status,
+            groupId: $debt->group_id,
             id: $debt->id,
         );
     }

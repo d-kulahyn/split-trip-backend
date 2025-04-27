@@ -11,6 +11,7 @@ class Debt
     /**
      * @param float $amount
      * @param string $currency
+     * @param string $groupId
      * @param int $from
      * @param int $to
      * @param DebtStatusEnum $status
@@ -19,6 +20,7 @@ class Debt
     public function __construct(
         public float $amount,
         public string $currency,
+        public string $groupId,
         public int $from,
         public int $to,
         public DebtStatusEnum $status = DebtStatusEnum::PENDING,

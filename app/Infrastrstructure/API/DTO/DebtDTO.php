@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Infrastrstructure\API\DTO;
 
 use Spatie\LaravelData\Data;
-use App\Domain\Enum\DebtStatusEnum;
 
-class DebtStatusDTO extends Data
+class DebtDTO extends Data
 {
     /**
-     * @param DebtStatusEnum $status
+     * @param float $amount
      */
     public function __construct(
-        public DebtStatusEnum $status,
+        public float $amount,
     ) {}
 
     /**
@@ -24,7 +23,7 @@ class DebtStatusDTO extends Data
     public static function rules(...$args): array
     {
         return [
-            'status' => 'required|in:'.implode(',', DebtStatusEnum::values())
+            'amount' => 'required|number'
         ];
     }
 }
