@@ -50,11 +50,12 @@ class GroupResource extends JsonResource
 
         $debts = $resource->hasMembers() ? array_map(function (Debt $debt) use ($customers) {
             return [
-                'from'   => new CustomerResource($customers[$debt->from]),
-                'to'     => new CustomerResource($customers[$debt->to]),
-                'amount' => $debt->amount,
-                'status' => $debt->status->value,
-                'id'     => $debt->id,
+                'from'     => new CustomerResource($customers[$debt->from]),
+                'to'       => new CustomerResource($customers[$debt->to]),
+                'amount'   => $debt->amount,
+                'status'   => $debt->status->value,
+                'id'       => $debt->id,
+                'currency' => $debt->currency,
             ];
         }, $resource->getDebts()) : [];
 
