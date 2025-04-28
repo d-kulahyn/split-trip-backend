@@ -60,7 +60,7 @@ readonly class AddExpenseUseCase
                 $expense->addDebtor(new Debtor(
                     amount  : $debtor->amount,
                     debtorId: $debtor->id,
-                    currency: $expenseDTO->currency,
+                    currency: $debtor->currency,
                 ));
             }
 
