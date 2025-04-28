@@ -23,6 +23,7 @@ class ExpenseResource extends JsonResource
             'paid'                   => $resource->paid($request->user()->id),
             'description'            => $resource->description,
             'currency'               => $resource->currency,
+            'groupId'                => $resource->groupId,
             'created_at'             => $resource->createdAt,
             'category'               => $resource->category,
             'payers'                 => PayerResource::collection($resource->payers),
