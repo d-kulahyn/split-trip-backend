@@ -259,6 +259,20 @@ class Group
     }
 
     /**
+     * @param int $id
+     *
+     * @return void
+     */
+    public function removeExpense(int $id): void
+    {
+        foreach ($this->expenses as $key => $expense) {
+            if ($expense->id === $id) {
+                unset($this->expenses[$key]);
+            }
+        }
+    }
+
+    /**
      * @throws GroupHasDebtsException
      */
     public function remove(): bool

@@ -9,6 +9,7 @@ use App\Application\UseCase\AddMemberUseCase;
 use App\Application\UseCase\CreateGroupUseCase;
 use App\Application\UseCase\RemoveMemberUseCase;
 use App\Application\UseCase\ToggleSimplifyDebtsUseCase;
+use App\Application\UseCase\UpdateExpenseUseCase;
 use App\Application\UseCase\UpdateGroupUseCase;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
@@ -19,6 +20,7 @@ use App\Infrastrstructure\API\Exceptions\UserAlreadyInGroupException;
 use App\Infrastrstructure\API\Resource\CustomerResource;
 use App\Infrastrstructure\API\Resource\GroupResource;
 use App\Infrastrstructure\Mapper\GroupEloquentToDomainEntity;
+use App\Models\Expense;
 use App\Models\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,6 +37,7 @@ readonly class GroupController
      * @param AddMemberUseCase $addMemberUseCase
      * @param UpdateGroupUseCase $updateGroupUseCase
      * @param AddExpenseUseCase $addExpenseUseCase
+     * @param UpdateExpenseUseCase $addExpenseUseCase
      * @param RemoveMemberUseCase $removeMemberUseCase
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
@@ -45,6 +48,7 @@ readonly class GroupController
         public AddMemberUseCase $addMemberUseCase,
         public UpdateGroupUseCase $updateGroupUseCase,
         public AddExpenseUseCase $addExpenseUseCase,
+        public UpdateExpenseUseCase $updateExpenseUseCase,
         public RemoveMemberUseCase $removeMemberUseCase,
         public GroupReadRepositoryInterface $groupReadRepository,
         public GroupWriteRepositoryInterface $groupWriteRepository,
@@ -125,6 +129,17 @@ readonly class GroupController
     {
         try {
             $expense = $this->addExpenseUseCase->execute($expenseDTO, $group->id, auth()->id());
+        } catch (UnauthorizedGroupActionException $e) {
+            return response()->json(['message' => $e->getMessage()], ResponseAlias::HTTP_FORBIDDEN);
+        }
+
+        return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_CREATED);
+    }
+
+    public function updateExpense(ExpenseDTO $expenseDTO, Group $group, Expense $expense)
+    {
+        try {
+            $expense = $this->updateExpenseUseCase->execute($expenseDTO, $group->id, $expense->id, auth()->id());
         } catch (UnauthorizedGroupActionException $e) {
             return response()->json(['message' => $e->getMessage()], ResponseAlias::HTTP_FORBIDDEN);
         }

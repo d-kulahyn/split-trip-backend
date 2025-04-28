@@ -17,6 +17,7 @@ Route::prefix('groups')->group(function () {
     Route::post('/{group}/members', [GroupController::class, 'addMember']);
     Route::delete('/{group}/members', [GroupController::class, 'removeMember']);
     Route::post('/{group}/expenses', [GroupController::class, 'addExpense']);
+    Route::put('/{group}/expenses/{expense}', [GroupController::class, 'updateExpense']);
 });
 
 Route::prefix('debts')->group(function () {
