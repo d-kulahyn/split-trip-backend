@@ -20,6 +20,7 @@ class DebtorResource extends JsonResource
             'id'     => $resource->id,
             'name'   => $resource->name,
             'amount' => $resource->amount,
+            'currency' => $resource->currency,
             'avatar' => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
         ];
     }
