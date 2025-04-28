@@ -17,7 +17,7 @@ class DebtorResource extends JsonResource
         $resource = $this->resource;
 
         return [
-            'id'     => $resource->id,
+            'id'     => $resource->debtorId,
             'name'   => $resource->name,
             'amount' => $resource->amount,
             'currency' => $resource->currency,

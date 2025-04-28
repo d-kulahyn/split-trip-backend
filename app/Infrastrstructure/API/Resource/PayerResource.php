@@ -17,7 +17,7 @@ class PayerResource extends JsonResource
         $resource = $this->resource;
 
         return [
-            'id'       => $resource->id,
+            'id'       => $resource->payerId,
             'name'     => $resource->name,
             'amount'   => $resource->amount,
             'currency' => $resource->currency,
