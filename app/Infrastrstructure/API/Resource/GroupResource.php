@@ -29,7 +29,7 @@ class GroupResource extends JsonResource
 
         $customers = $customerReadRepository->findById($resource->getMemberIds());
 
-        $overallBalance = $customerReadRepository->findById(auth()->id())->first()->getBalance();
+        $overallBalance = $customerReadRepository->findById([auth()->id()])->first()->getBalance();
 
         $balances = $resource->hasMembers() ? array_map(function (Balance $balance, int $customerId) use (
             $customers
