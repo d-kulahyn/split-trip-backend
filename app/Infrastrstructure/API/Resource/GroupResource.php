@@ -76,6 +76,9 @@ class GroupResource extends JsonResource
                 return $customer->resource->id === auth()->id();
             }
         )[0];
+        
+        header('Content-Type: application/json');
+        echo json_encode($myBalance);die;
 
         return [
             'id'             => $resource->id,
