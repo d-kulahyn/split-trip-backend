@@ -70,15 +70,15 @@ class GroupResource extends JsonResource
             return $b['amount'] <=> $a['amount'];
         });
 
+        header('Content-Type: application/json');
+        echo json_encode($balances);die;
+
         $myBalance = array_filter(
             $balances,
             function (CustomerResource $customer) {
                 return $customer->resource->id === auth()->id();
             }
         )[0];
-        
-        header('Content-Type: application/json');
-        echo json_encode($myBalance);die;
 
         return [
             'id'             => $resource->id,
