@@ -24,6 +24,7 @@ class Group
      * @param array $debts
      * @param array $members
      * @param array $expenses
+     * @param array $expensesToDelete
      */
     public function __construct(
         public string $name,
@@ -36,6 +37,7 @@ class Group
         public array $debts = [],
         private array $members = [],
         private array $expenses = [],
+        private array $expensesToDelete = []
     ) {}
 
     /**
@@ -267,9 +269,18 @@ class Group
     {
         foreach ($this->expenses as $key => $expense) {
             if ($expense->id === $id) {
+                $this->expensesToDelete[] = $expense;
                 unset($this->expenses[$key]);
             }
         }
+    }
+
+    /**
+     * @return array<Expense>
+     */
+    public function getExpensesToDelete(): array
+    {
+        return $this->expensesToDelete;
     }
 
     /**

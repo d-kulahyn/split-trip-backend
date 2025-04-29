@@ -73,6 +73,7 @@ readonly class UpdateExpenseUseCase
             }
 
             $group->removeExpense($expenseId);
+            $group->addExpense($expense);
 
             $expense->distributeDebts($this->currencyConverterService, $group->finalCurrency);
 

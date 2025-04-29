@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\Customer;
+use App\Domain\Entity\Expense;
 use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
 use App\Models\Debtor;
@@ -38,6 +39,15 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                 fn(Customer $customer) => $customer->id,
                 $group->getMembers()
             )));
+
+            $idsToDelete = array_map(
+                fn (Expense $expense) => $expense->id,
+                $group->getExpensesToDelete()
+            );
+
+            if (!empty($idsToDelete)) {
+                \App\Models\Expense::query()->whereIn('id', $idsToDelete)->delete();
+            }
 
             foreach ($group->getExpenses() as $expense) {
                 $eloquentExpense = $eloquentGroup->expenses()->updateOrCreate(

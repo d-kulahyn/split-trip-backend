@@ -18,6 +18,7 @@ use App\Infrastrstructure\API\DTO\RequestGroupDTO;
 use App\Infrastrstructure\API\Exceptions\UnauthorizedGroupActionException;
 use App\Infrastrstructure\API\Exceptions\UserAlreadyInGroupException;
 use App\Infrastrstructure\API\Resource\CustomerResource;
+use App\Infrastrstructure\API\Resource\ExpenseResource;
 use App\Infrastrstructure\API\Resource\GroupResource;
 use App\Infrastrstructure\Mapper\GroupEloquentToDomainEntity;
 use App\Models\Expense;
@@ -136,7 +137,7 @@ readonly class GroupController
         return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_CREATED);
     }
 
-    public function updateExpense(ExpenseDTO $expenseDTO, Group $group, Expense $expense)
+    public function updateExpense(ExpenseDTO $expenseDTO, Group $group, Expense $expense): Response|JsonResponse
     {
         try {
             $expense = $this->updateExpenseUseCase->execute($expenseDTO, $group->id, $expense->id, auth()->id());
@@ -144,7 +145,13 @@ readonly class GroupController
             return response()->json(['message' => $e->getMessage()], ResponseAlias::HTTP_FORBIDDEN);
         }
 
-        return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_CREATED);
+        return response(
+            [
+                'group' => new GroupResource($this->groupReadRepository->findById($group->id)),
+                'expense' => new ExpenseResource($expense)
+            ],
+            ResponseAlias::HTTP_CREATED
+        );
     }
 
     /**
