@@ -70,9 +70,6 @@ class GroupResource extends JsonResource
             return $b['amount'] <=> $a['amount'];
         });
 
-        header('Content-Type: application/json');
-        echo json_encode($balances);die;
-
         $myBalance = array_filter(
             $balances,
             function (CustomerResource $customer) {
