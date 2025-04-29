@@ -3,7 +3,7 @@
         "relation": ["delegate_permission/common.handle_all_urls"],
         "target": {
             "namespace": "android_app",
-            "package_name": "com.example.split_trip",
+            "package_name": "split.trip.app",
             "sha256_cert_fingerprints": [
                 "EE:07:B4:B9:BE:5F:85:02:64:EE:E5:9B:D0:E1:E5:AC:18:13:18:53:5A:B8:39:00:2B:D9:33:4E:83:D5:F4:DF"
             ]
