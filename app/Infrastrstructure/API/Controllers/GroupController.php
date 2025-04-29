@@ -7,6 +7,7 @@ namespace App\Infrastrstructure\API\Controllers;
 use App\Application\UseCase\AddExpenseUseCase;
 use App\Application\UseCase\AddMemberUseCase;
 use App\Application\UseCase\CreateGroupUseCase;
+use App\Application\UseCase\DeleteExpenseUseCase;
 use App\Application\UseCase\RemoveMemberUseCase;
 use App\Application\UseCase\ToggleSimplifyDebtsUseCase;
 use App\Application\UseCase\UpdateExpenseUseCase;
@@ -23,6 +24,7 @@ use App\Infrastrstructure\API\Resource\GroupResource;
 use App\Infrastrstructure\Mapper\GroupEloquentToDomainEntity;
 use App\Models\Expense;
 use App\Models\Group;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -38,7 +40,8 @@ readonly class GroupController
      * @param AddMemberUseCase $addMemberUseCase
      * @param UpdateGroupUseCase $updateGroupUseCase
      * @param AddExpenseUseCase $addExpenseUseCase
-     * @param UpdateExpenseUseCase $addExpenseUseCase
+     * @param UpdateExpenseUseCase $updateExpenseUseCase
+     * @param DeleteExpenseUseCase $deleteExpenseUseCase
      * @param RemoveMemberUseCase $removeMemberUseCase
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
@@ -50,6 +53,7 @@ readonly class GroupController
         public UpdateGroupUseCase $updateGroupUseCase,
         public AddExpenseUseCase $addExpenseUseCase,
         public UpdateExpenseUseCase $updateExpenseUseCase,
+        public DeleteExpenseUseCase $deleteExpenseUseCase,
         public RemoveMemberUseCase $removeMemberUseCase,
         public GroupReadRepositoryInterface $groupReadRepository,
         public GroupWriteRepositoryInterface $groupWriteRepository,
@@ -75,7 +79,8 @@ readonly class GroupController
 
         $group = $this->createGroupUseCase->execute($groupDTO);
 
-        return response(new GroupResource($this->groupReadRepository->findById($group->id)), 201);
+        return response(new GroupResource($this->groupReadRepository->findById($group->id)),
+            ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -129,14 +134,24 @@ readonly class GroupController
     public function addExpense(ExpenseDTO $expenseDTO, Group $group): Response|JsonResponse
     {
         try {
-            $expense = $this->addExpenseUseCase->execute($expenseDTO, $group->id, auth()->id());
+            $this->addExpenseUseCase->execute($expenseDTO, $group->id, auth()->id());
         } catch (UnauthorizedGroupActionException $e) {
             return response()->json(['message' => $e->getMessage()], ResponseAlias::HTTP_FORBIDDEN);
         }
 
-        return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_CREATED);
+        return response(
+            new GroupResource($this->groupReadRepository->findById($group->id)),
+            ResponseAlias::HTTP_CREATED
+        );
     }
 
+    /**
+     * @param ExpenseDTO $expenseDTO
+     * @param Group $group
+     * @param Expense $expense
+     *
+     * @return Response|JsonResponse
+     */
     public function updateExpense(ExpenseDTO $expenseDTO, Group $group, Expense $expense): Response|JsonResponse
     {
         try {
@@ -147,11 +162,24 @@ readonly class GroupController
 
         return response(
             [
-                'group' => new GroupResource($this->groupReadRepository->findById($group->id)),
-                'expense' => new ExpenseResource($expense)
+                'group'   => new GroupResource($this->groupReadRepository->findById($group->id)),
+                'expense' => new ExpenseResource($expense),
             ],
             ResponseAlias::HTTP_CREATED
         );
+    }
+
+    /**
+     * @param Group $group
+     * @param Expense $expense
+     *
+     * @return Response
+     */
+    public function deleteExpense(Group $group, Expense $expense): Response
+    {
+        $this->deleteExpenseUseCase->execute($group->id, $expense->id, auth()->id());
+
+        return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_OK);
     }
 
     /**
@@ -200,7 +228,7 @@ readonly class GroupController
     {
         try {
             GroupEloquentToDomainEntity::toEntity($group)->remove();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], ResponseAlias::HTTP_BAD_REQUEST);
         }
 
