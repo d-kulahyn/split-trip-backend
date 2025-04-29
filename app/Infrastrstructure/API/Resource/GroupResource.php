@@ -29,6 +29,8 @@ class GroupResource extends JsonResource
 
         $customers = $customerReadRepository->findById($resource->getMemberIds());
 
+        $overallBalance = $customers[auth()->id()]->getBalance();
+
         $balances = $resource->hasMembers() ? array_map(function (Balance $balance, int $customerId) use (
             $customers
         ) {
@@ -71,11 +73,11 @@ class GroupResource extends JsonResource
         });
 
         $myBalance = array_filter(
-            $balances,
-            function (CustomerResource $customer) {
-                return $customer->resource->id === auth()->id();
-            }
-        )[0];
+                         $balances,
+                         function (CustomerResource $customer) {
+                             return $customer->resource->id === auth()->id();
+                         }
+                     )[0];
 
         return [
             'id'             => $resource->id,
@@ -92,7 +94,7 @@ class GroupResource extends JsonResource
             'debts'          => $debts,
             'rates'          => $currencyReadRepository->rates($resource->finalCurrency),
             'avatar'         => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
-            'overallBalance' => $customers[auth()->id()]->getBalance(),
+            'overallBalance' => $overallBalance,
         ];
     }
 }
