@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Domain\Policies\DebtPolicy;
+use App\Domain\Policies\ExpensePolicy;
 use App\Domain\Policies\GroupPolicy;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 use App\Domain\Repository\CurrencyReadRepositoryInterface;
@@ -24,6 +25,7 @@ use App\Infrastrstructure\Persistence\EloquentTransactionWriteRepository;
 use App\Infrastrstructure\Persistence\ExchangeRateApiCurrencyReadRepository;
 use App\Infrastrstructure\Service\Interface\SecurityCodeStorageInterface;
 use App\Infrastrstructure\Service\SecurityCodeRedisStorage;
+use App\Models\Expense;
 use App\Models\ExpenseDebt;
 use App\Models\Group;
 use Illuminate\Contracts\Foundation\Application;
@@ -77,6 +79,7 @@ class AppServiceProvider extends ServiceProvider
         bcscale(2);
 
         Gate::policy(ExpenseDebt::class, DebtPolicy::class);
+        Gate::policy(Expense::class, ExpensePolicy::class);
         Gate::policy(Group::class, GroupPolicy::class);
     }
 }
