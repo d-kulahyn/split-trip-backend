@@ -94,7 +94,7 @@ class GroupResource extends JsonResource
             'debts'          => $debts,
             'rates'          => $currencyReadRepository->rates($resource->finalCurrency),
             'avatar'         => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
-            'overallBalance' => $overallBalance,
+            'overallBalance' => $overallBalance->toArray(),
         ];
     }
 }
