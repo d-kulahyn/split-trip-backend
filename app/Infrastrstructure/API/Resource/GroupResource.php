@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastrstructure\API\Resource;
 
+use App\Application\UseCase\CustomerAuthMeUseCase;
 use App\Domain\Entity\Debt;
 use App\Domain\Entity\Group;
 use App\Domain\Repository\CurrencyReadRepositoryInterface;
@@ -22,6 +23,7 @@ class GroupResource extends JsonResource
     public function toArray($request): array
     {
         $currencyReadRepository = app(CurrencyReadRepositoryInterface::class);
+        $customerAuthMeUseCase = app(CustomerAuthMeUseCase::class);
         $customerReadRepository = app(CustomerReadRepositoryInterface::class);
 
         /** @var Group $resource */
@@ -29,7 +31,7 @@ class GroupResource extends JsonResource
 
         $customers = $customerReadRepository->findById($resource->getMemberIds());
 
-        $overallBalance = $customerReadRepository->findById([auth()->id()])->first()->getBalance();
+        $overallBalance = $customerAuthMeUseCase->execute(auth()->id())['balance'];
 
         $balances = $resource->hasMembers() ? array_map(function (Balance $balance, int $customerId) use (
             $customers
