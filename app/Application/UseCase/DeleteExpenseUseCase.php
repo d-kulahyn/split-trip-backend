@@ -28,9 +28,9 @@ readonly class DeleteExpenseUseCase
      * @param int $expenseId
      * @param int $customerId
      *
-     * @return Expense
+     * @return bool
      */
-    public function execute(string $groupId, int $expenseId, int $customerId): Expense
+    public function execute(string $groupId, int $expenseId, int $customerId): bool
     {
         return DB::transaction(function () use ($groupId, $expenseId, $customerId) {
             $group = $this->groupReadRepository->findById($groupId);
