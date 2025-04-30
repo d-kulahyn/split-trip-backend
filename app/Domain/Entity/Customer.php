@@ -8,8 +8,9 @@ use App\Domain\Enum\DebtReminderPeriodEnum;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use App\Infrastrstructure\Service\CurrencyConverterService;
+use Spatie\LaravelData\Data;
 
-class Customer
+class Customer extends Data
 {
     /**
      * @param string $password
