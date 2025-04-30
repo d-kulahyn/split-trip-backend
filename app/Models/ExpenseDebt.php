@@ -48,6 +48,11 @@ class ExpenseDebt extends Model
         return $this->belongsTo(Expense::class);
     }
 
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(Group::class);
+    }
+
     /**
      * @return BelongsTo
      */

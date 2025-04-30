@@ -42,7 +42,7 @@ readonly class NotificationController
                 new RemindDebtMessage([
                     'amount'       => $debt->amount,
                     'currency'     => $debt->currency,
-                    'groupName'    => $debt->expense->group->name,
+                    'groupName'    => $debt->group->name,
                     'creditorName' => $debt->creditor->name,
                     'token'        => $customer->firebase_cloud_messaging_token,
                 ])
