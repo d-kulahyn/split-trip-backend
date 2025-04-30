@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TransactionWriteRepositoryInterface::class, EloquentTransactionWriteRepository::class);
 
         $this->app->bind(Factory::class, function (Application $app) {
-            return (new Factory())->withServiceAccount($app->basePath('firebase.json'));
+            return (new Factory())->withServiceAccount(file_get_contents($app->basePath('firebase.json')));
         });
     }
 
