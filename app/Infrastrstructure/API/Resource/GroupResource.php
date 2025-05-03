@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastrstructure\API\Resource;
 
+use App\Domain\Entity\Customer;
 use App\Domain\Entity\Debt;
 use App\Domain\Entity\Group;
 use App\Domain\Repository\CurrencyReadRepositoryInterface;
@@ -30,6 +31,12 @@ class GroupResource extends JsonResource
         $customers = $customerReadRepository->findById($resource->getMemberIds());
 
         $overallBalance = $customers[auth()->id()]->getBalance();
+
+        $overallBalances = [];
+        /** @var Customer $customer */
+        foreach ($customers as $customer)  {
+            $overallBalances[$customer->id] = $customer->getBalance();
+        }
 
         $balances = $resource->hasMembers() ? array_map(function (Balance $balance, int $customerId) use (
             $customers
@@ -95,6 +102,7 @@ class GroupResource extends JsonResource
             'rates'          => $currencyReadRepository->rates($resource->finalCurrency),
             'avatar'         => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
             'overallBalance' => $overallBalance,
+            'overallBalances' => $overallBalances,
         ];
     }
 }
