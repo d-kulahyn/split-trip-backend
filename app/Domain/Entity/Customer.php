@@ -94,7 +94,8 @@ class Customer extends Data
         $generalBalance = new Balance(
             owe    : 0,
             paid   : 0,
-            balance: 0
+            balance: 0,
+            customerId: $this->id,
         );
 
         /** @var Group $group */
