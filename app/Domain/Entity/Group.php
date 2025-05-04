@@ -113,12 +113,6 @@ class Group
      */
     public function getMemberIds(): array
     {
-        header('Content-Type: application/json');
-        echo json_encode([
-            "isArray" => is_array($this->members[0]),
-            "isObject" => is_object($this->members[0]),
-            "member" => $this->members[0]
-        ]);die;
         return array_map(fn(Customer $member) => $member->id, $this->members);
     }
 
