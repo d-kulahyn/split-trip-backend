@@ -92,11 +92,13 @@ class EloquentCustomerReadRepository implements CustomerReadRepositoryInterface
      */
     public function groups(int $customerId, array $with = ['members', 'expenses']): Collection
     {
-        $groups = Group::query()->where('created_by', $customerId)
+        $groups = Group::query()
+            ->where('created_by', $customerId)
             ->orWhereHas('members', function ($query) use ($customerId) {
                 $query->where('customer_id', $customerId);
             })
-            ->with($with)->get();
+            ->with($with)
+            ->get();
 
         return $groups->map(function ($group) {
             return EloquentGroupMapper::map($group);

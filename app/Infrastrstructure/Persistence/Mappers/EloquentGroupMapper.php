@@ -38,14 +38,14 @@ class EloquentGroupMapper
                     status  : $debt->status,
                     id      : $debt->id,
                 );
-            })->toArray(),
+            })->all(),
             members      : $group->members->map(function (Customer $customer) {
                 return new \App\Domain\Entity\Customer(
                     password: $customer->password,
                     email   : $customer->email,
                     id      : $customer->id,
                 );
-            })->toArray(),
+            })->all(),
             expenses     : $group->expenses->map(function (Expense $expense) {
                 return new \App\Domain\Entity\Expense(
                     category   : $expense->category,
@@ -64,7 +64,7 @@ class EloquentGroupMapper
                             status  : $expenseDebt->status,
                             id      : $expenseDebt->id,
                         );
-                    })->toArray(),
+                    })->all(),
                     debtors    : $expense->debtors->map(function (\App\Models\Debtor $debtor) {
                         return new Debtor(
                             amount  : $debtor->amount,
@@ -74,7 +74,7 @@ class EloquentGroupMapper
                             name    : $debtor->customer->name,
                             avatar  : $debtor->customer->avatar,
                         );
-                    })->toArray(),
+                    })->all(),
                     payers     : $expense->payers->map(function (\App\Models\Payer $payer) {
                         return new Payer(
                             amount  : $payer->amount,
@@ -84,9 +84,9 @@ class EloquentGroupMapper
                             avatar  : $payer->customer->avatar,
                             name    : $payer->customer->name
                         );
-                    })->toArray(),
+                    })->all(),
                 );
-            })->toArray(),
+            })->all(),
         );
     }
 }
