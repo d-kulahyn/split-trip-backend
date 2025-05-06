@@ -35,7 +35,7 @@ readonly class NotificationController
         ];
 
         /** @var Customer $customer */
-        $customer = $this->customerReadRepository->findById([$debt->to])->first();
+        $customer = $this->customerReadRepository->findById([$debt->from])->first();
 
         file_put_contents('/var/www/html/log.log', print_r($customer->toArray(), true), FILE_APPEND);
 
