@@ -39,6 +39,7 @@ readonly class CustomerAuthMeUseCase
             'email_notifications'            => $customer->email_notifications,
             'push_notifications'             => $customer->push_notifications,
             'debt_reminder_period'           => $customer->debt_reminder_period,
+            'avatar_color'                   => $customer->avatar_color,
         ];
     }
 }

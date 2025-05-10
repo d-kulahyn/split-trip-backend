@@ -33,7 +33,9 @@ class CustomerEloquentToDomainEntity
                 $friend->name,
                 $customerEloquent->avatar,
                 $friend->id,
-                $friend->currency
+                $friend->currency,
+                null,
+                $friend->avatar_color,
             );
         }
 
@@ -52,6 +54,8 @@ class CustomerEloquentToDomainEntity
             $customerEloquent->avatar,
             $customerEloquent->id,
             $customerEloquent->currency,
+            null,
+            $customerEloquent->avatar_color,
         );
     }
 }

@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('currency', 3)->default('USD');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
+            $table->string('avatar_color')->nullable()->default(null);
             $table->string('firebase_cloud_messaging_token')->nullable()->default(null);
             $table->string('debt_reminder_period')->nullable()->default(null);
         });

@@ -29,6 +29,7 @@ class CustomerResource extends JsonResource
             'email_notifications'  => $resource->email_notifications,
             'push_notifications'   => $resource->push_notifications,
             'debt_reminder_period' => $resource->debt_reminder_period,
+            'avatar_color'         => $resource->avatar_color,
         ];
     }
 }

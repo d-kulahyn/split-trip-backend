@@ -26,8 +26,9 @@ class Customer extends Data
      * @param string|null $name
      * @param string|null $avatar
      * @param int|null $id
-     * @param Balance|null $balance
      * @param string|null $currency
+     * @param Balance|null $balance
+     * @param string|null $avatar_color
      */
     public function __construct(
         public string $password,
@@ -44,7 +45,8 @@ class Customer extends Data
         public ?string $avatar = null,
         public ?int $id = null,
         public ?string $currency = null,
-        public ?Balance $balance = null
+        public ?Balance $balance = null,
+        public ?string $avatar_color = null,
     ) {}
 
     /**
