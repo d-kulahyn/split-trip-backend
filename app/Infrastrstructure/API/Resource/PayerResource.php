@@ -17,11 +17,11 @@ class PayerResource extends JsonResource
         $resource = $this->resource;
 
         return [
-            'id'       => $resource->payerId,
-            'name'     => $resource->name,
-            'amount'   => $resource->amount,
-            'currency' => $resource->currency,
-            'avatar'   => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
+            'id'          => $resource->payerId,
+            'name'        => $resource->name,
+            'amount'      => $resource->amount,
+            'currency'    => $resource->currency,
+            'avatarColor' => $resource->avatarColor,
         ];
     }
 }
