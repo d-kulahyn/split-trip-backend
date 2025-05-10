@@ -34,6 +34,7 @@ class EloquentCustomerMapper
             avatar                        : $customer->avatar,
             id                            : $customer->id,
             currency                      : $customer->currency,
+            avatar_color                  : $customer->avatar_color,
 
         );
     }

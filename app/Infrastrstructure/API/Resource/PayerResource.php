@@ -21,7 +21,7 @@ class PayerResource extends JsonResource
             'name'        => $resource->name,
             'amount'      => $resource->amount,
             'currency'    => $resource->currency,
-            'avatarColor' => $resource->avatarColor,
+            'avatar_color' => $resource->avatarColor,
         ];
     }
 }
