@@ -37,7 +37,7 @@ class Customer extends Authenticatable implements MustVerifyEmail
         'push_notifications',
         'email_notifications',
         'debt_reminder_period',
-        'debt_reminder_period',
+        'avatar_color',
     ];
 
     /**

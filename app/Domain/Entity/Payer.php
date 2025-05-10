@@ -11,7 +11,7 @@ class Payer
      * @param string $currency
      * @param int $payerId
      * @param int|null $id
-     * @param string|null $avatar
+     * @param string|null $avatarColor
      * @param string|null $name
      */
     public function __construct(
@@ -19,7 +19,7 @@ class Payer
         public string $currency,
         public int $payerId,
         public ?int $id = null,
-        public ?string $avatar = null,
+        public ?string $avatarColor = null,
         public ?string $name = null,
     ) {}
 }
