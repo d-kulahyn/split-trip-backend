@@ -34,6 +34,7 @@ class EloquentCustomerWriteRepository implements CustomerWriteRepositoryInterfac
             'push_notifications'             => $customer->push_notifications,
             'email_notifications'            => $customer->email_notifications,
             'debt_reminder_period'           => $customer->debt_reminder_period->value,
+            'avatar_color'                   => $customer->avatar_color,
         ]);
 
         $eloquentCustomer->friends()->attach($customer->friends);
