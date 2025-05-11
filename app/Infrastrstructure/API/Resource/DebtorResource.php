@@ -6,7 +6,6 @@ namespace App\Infrastrstructure\API\Resource;
 
 use App\Domain\Entity\Debtor;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 class DebtorResource extends JsonResource
 {
@@ -21,7 +20,7 @@ class DebtorResource extends JsonResource
             'name'   => $resource->name,
             'amount' => $resource->amount,
             'currency' => $resource->currency,
-            'avatar' => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
+            'avatar_color' => $resource->avatarColor,
         ];
     }
 }

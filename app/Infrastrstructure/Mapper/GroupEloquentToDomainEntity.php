@@ -78,7 +78,7 @@ class GroupEloquentToDomainEntity
                             currency: $debtor->currency,
                             id      : $debtor->id,
                             name    : $debtor->customer->name,
-                            avatar  : $debtor->customer->avatar,
+                            avatarColor  : $debtor->customer->avatar_color,
                         );
                     })->toArray(),
                     payers     : $expense->payers->map(function (PayerModel $payer) {

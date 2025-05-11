@@ -12,7 +12,7 @@ class Debtor
      * @param string $currency
      * @param int|null $id
      * @param string|null $name
-     * @param string|null $avatar
+     * @param string|null $avatarColor
      */
     public function __construct(
         public float $amount,
@@ -20,6 +20,6 @@ class Debtor
         public string $currency,
         public ?int $id = null,
         public ?string $name = null,
-        public ?string $avatar = null
+        public ?string $avatarColor = null,
     ) {}
 }

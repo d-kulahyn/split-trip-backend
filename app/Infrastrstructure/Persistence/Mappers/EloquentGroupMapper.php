@@ -72,7 +72,7 @@ class EloquentGroupMapper
                             currency: $debtor->currency,
                             id      : $debtor->id,
                             name    : $debtor->customer->name,
-                            avatar  : $debtor->customer->avatar,
+                            avatarColor  : $debtor->customer->avatar_color,
                         );
                     })->all(),
                     payers     : $expense->payers->map(function (\App\Models\Payer $payer) {
