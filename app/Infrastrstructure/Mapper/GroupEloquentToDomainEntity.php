@@ -52,6 +52,8 @@ class GroupEloquentToDomainEntity
             foreach ($groupEloquent->members as $member) {
                 $domainGroup->addMember(CustomerEloquentToDomainEntity::toEntity($member));
             }
+
+            $domainGroup->addMember(CustomerEloquentToDomainEntity::toEntity($groupEloquent->owner));
         }
 
         if ($groupEloquent->relationLoaded('expenses')) {

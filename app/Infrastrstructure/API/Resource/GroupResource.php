@@ -48,12 +48,12 @@ class GroupResource extends JsonResource
             'members'         => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
             'currencies'      => $currencyReadRepository->codes(),
             'expenses'        => ExpenseResource::collection($resource->getExpenses()),
-            'myBalance'       => $balances[auth()->id()] ?? new Balance(),
+            'myBalance'       => $balances[auth()->id()],
             'simplify_debts'  => $resource->simplifyDebts,
             'balances'        => $balances,
             'rates'           => $currencyReadRepository->rates($resource->finalCurrency),
             'avatar'          => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
-            'overallBalance'  => isset($members[request()->user()->id]) ? $members[request()->user()->id]->getBalance() : new Balance(),
+            'overallBalance'  => $members[request()->user()->id]->getBalance(),
             'overallBalances' => $overallBalances,
         ];
     }
