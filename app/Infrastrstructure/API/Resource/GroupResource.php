@@ -53,7 +53,7 @@ class GroupResource extends JsonResource
             'balances'        => $balances,
             'rates'           => $currencyReadRepository->rates($resource->finalCurrency),
             'avatar'          => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
-            'overallBalance'  => isset($members[request()->user()->id]) ? $members[request()->user()->id]->getBalance() : [],
+            'overallBalance'  => isset($members[request()->user()->id]) ? $members[request()->user()->id]->getBalance() : new Balance(),
             'overallBalances' => $overallBalances,
         ];
     }
