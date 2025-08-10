@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase;
 
-use App\Domain\Enum\DebtStatusEnum;
+use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\API\DTO\RequestGroupDTO;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
@@ -36,7 +36,7 @@ readonly class UpdateGroupUseCase
         /** Recalculate all debts */
         if ($group->finalCurrency !== $groupDTO->currency) {
             foreach ($group->getDebts() as $debt) {
-                if ($debt->status === DebtStatusEnum::PAID) continue;
+                if ($debt->status === StatusEnum::PAID) continue;
 
                 $debt->amount = $this->currencyConverterService->convert(
                     $debt->currency,

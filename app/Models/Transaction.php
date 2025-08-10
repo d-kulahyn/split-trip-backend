@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Domain\Enum\StatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Transaction extends Model
 {
@@ -14,6 +16,11 @@ class Transaction extends Model
      */
     protected $table = 'transactions';
 
+    protected $casts = [
+        'status' => StatusEnum::class,
+        'amount' => 'float',
+    ];
+
     /**
      * @var string[]
      */
@@ -22,6 +29,22 @@ class Transaction extends Model
         'from',
         'to',
         'currency',
+        'status',
         'group_id',
     ];
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+
+    public function fromC(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'from');
+    }
+
+    public function toC(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'to');
+    }
 }

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Infrastrstructure\API\Resource;
 
 use App\Domain\Entity\Customer;
-use App\Domain\Entity\Debt;
 use App\Domain\Entity\Group;
 use App\Domain\Repository\CurrencyReadRepositoryInterface;
+use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Domain\Repository\CustomerReadRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 
 class GroupResource extends JsonResource
@@ -28,80 +27,33 @@ class GroupResource extends JsonResource
         /** @var Group $resource */
         $resource = $this->resource;
 
-        $customers = $customerReadRepository->findById($resource->getMemberIds());
+        $members = $resource->getMembers();
 
-        $overallBalance = $customers[auth()->id()]->getBalance();
+        $balances = array_map(
+            fn(Balance $balance) => $members[$balance->customerId]->setBalance($balance),
+            $resource->getBalances()
+        );
 
-        $overallBalances = [];
-        /** @var Customer $customer */
-        foreach ($customers as $customer)  {
-            $overallBalances[$customer->id] = $customer->getBalance();
-        }
 
-        $balances = $resource->hasMembers() ? array_map(function (Balance $balance, int $customerId) use (
-            $customers
-        ) {
-            $customers[$customerId]->setBalance($balance);
-
-            return new CustomerResource($customers[$customerId]);
-        }, $resource->getBalances(), array_keys($resource->getBalances())) : [];
-
-        usort($balances, function (CustomerResource $a, CustomerResource $b) {
-            if ($a->resource->id == auth()->id()) {
-                return -1;
-            }
-            if ($b->resource->id == auth()->id()) {
-                return 1;
-            }
-
-            return $b->resource->getBalance()->balance <=> $a->resource->getBalance()->balance;
-        });
-
-        $debts = $resource->hasMembers() ? array_map(function (Debt $debt) use ($customers) {
-            return [
-                'from'     => new CustomerResource($customers[$debt->from]),
-                'to'       => new CustomerResource($customers[$debt->to]),
-                'amount'   => $debt->amount,
-                'status'   => $debt->status->value,
-                'id'       => $debt->id,
-                'currency' => $debt->currency,
-            ];
-        }, $resource->getDebts()) : [];
-
-        usort($debts, function ($a, $b) {
-            if ($a['from']->resource->id == auth()->id()) {
-                return -1;
-            }
-            if ($b['from']->resource->id == auth()->id()) {
-                return 1;
-            }
-
-            return $b['amount'] <=> $a['amount'];
-        });
-
-        $myBalance = array_filter(
-                         $balances,
-                         function (CustomerResource $customer) {
-                             return $customer->resource->id === auth()->id();
-                         }
-                     )[0];
+        $overallBalances = $customerReadRepository->findById($resource->getMemberIds())?->all() ?? [];
+        $overallBalances = array_map(fn(Customer $customer) => $customer->getBalance(), $overallBalances);
 
         return [
-            'id'             => $resource->id,
-            'name'           => $resource->name,
-            'category'       => $resource->category,
-            'final_currency' => $resource->finalCurrency,
-            'created_by'     => $resource->createdBy,
-            'members'        => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
-            'currencies'     => $currencyReadRepository->codes(),
-            'expenses'       => ExpenseResource::collection($resource->getExpenses()),
-            'myBalance'      => $myBalance,
-            'simplify_debts' => $resource->simplifyDebts,
-            'balances'       => $balances,
-            'debts'          => $debts,
-            'rates'          => $currencyReadRepository->rates($resource->finalCurrency),
-            'avatar'         => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
-            'overallBalance' => $overallBalance,
+            'debts'           => DebtResource::collection($resource->getDebts()),
+            'id'              => $resource->id,
+            'name'            => $resource->name,
+            'category'        => $resource->category,
+            'final_currency'  => $resource->finalCurrency,
+            'created_by'      => $resource->createdBy,
+            'members'         => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
+            'currencies'      => $currencyReadRepository->codes(),
+            'expenses'        => ExpenseResource::collection($resource->getExpenses()),
+            'myBalance'       => $balances[auth()->id()] ?? new Balance(),
+            'simplify_debts'  => $resource->simplifyDebts,
+            'balances'        => $balances,
+            'rates'           => $currencyReadRepository->rates($resource->finalCurrency),
+            'avatar'          => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
+            'overallBalance'  => isset($members[request()->user()->id]) ? $members[request()->user()->id]->getBalance() : [],
             'overallBalances' => $overallBalances,
         ];
     }

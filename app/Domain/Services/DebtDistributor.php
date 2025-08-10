@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Services;
 
 use App\Domain\Entity\Debt;
+use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use Illuminate\Support\Collection;
 
@@ -20,6 +21,11 @@ class DebtDistributor
     public function distributeDebts(Collection $balances, string $currency, string $groupId): array
     {
         $debts = [];
+
+        /** @var CustomerReadRepositoryInterface $customerRepository */
+        $customerRepository = app(CustomerReadRepositoryInterface::class);
+
+        $customers = $customerRepository->findById($balances->pluck('customerId')->toArray())->keyBy('id');
 
         $debtors = $balances->filter(fn(Balance $b) => $b->balance < 0)->sortBy('balance');
         $payers = $balances->filter(fn(Balance $b) => $b->balance > 0)->sortByDesc('balance');
@@ -46,8 +52,8 @@ class DebtDistributor
                     $amount,
                     $currency,
                     $groupId,
-                    $debtorId,
-                    $payerId,
+                    $customers[$debtorId],
+                    $customers[$payerId],
                 );
             }
         }

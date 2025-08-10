@@ -4,25 +4,17 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase;
 
-use App\Application\DebtException;
-use App\Domain\Entity\Debt;
 use App\Domain\Entity\Transaction;
-use App\Domain\Enum\DebtStatusEnum;
-use App\Domain\Repository\DebtReadRepositoryInterface;
-use App\Domain\Repository\DebtWriteRepositoryInterface;
-use App\Domain\Repository\TransactionWriteRepositoryInterface;
+use App\Events\TransactionCreated;
 use App\Infrastrstructure\API\DTO\DebtDTO;
+use App\Domain\Listener\TransactionCreatedListener;
+use App\Domain\Repository\DebtReadRepositoryInterface;
+use App\Domain\Repository\TransactionWriteRepositoryInterface;
 
 readonly class UpdateDebtUseCase
 {
-    /**
-     * @param DebtReadRepositoryInterface $debtReadRepository
-     * @param DebtWriteRepositoryInterface $debtWriteRepository
-     * @param TransactionWriteRepositoryInterface $transactionWriteRepository
-     */
     public function __construct(
         private DebtReadRepositoryInterface $debtReadRepository,
-        private DebtWriteRepositoryInterface $debtWriteRepository,
         private TransactionWriteRepositoryInterface $transactionWriteRepository
     ) {}
 
@@ -30,25 +22,17 @@ readonly class UpdateDebtUseCase
      * @param int $id
      * @param DebtDTO $debtDTO
      *
-     * @throws DebtException
      * @return void
      */
     public function execute(int $id, DebtDTO $debtDTO): void
     {
-        /** @var Debt $debt */
         $debt = $this->debtReadRepository->findById($id);
 
-        if ($debtDTO->amount <= 0 || $debtDTO->amount > $debt->amount) {
-            throw new DebtException('Invalid amount provided.');
+        if ($debt->amount < $debtDTO->amount || $debtDTO->amount < 0) {
+            throw new \InvalidArgumentException('Invalid amount for debt update. The new amount must be less than or equal to the current amount and greater than or equal to zero.');
         }
 
-        $debt->amount = (float)bcsub((string)$debt->amount, (string)$debtDTO->amount, 2);
-
-        if ($debt->amount === 0.00) {
-            $debt->status = DebtStatusEnum::PAID;
-        }
-
-        $this->transactionWriteRepository->save(
+        $transaction = $this->transactionWriteRepository->save(
             new Transaction(
                 from    : $debt->from,
                 to      : $debt->to,
@@ -58,6 +42,6 @@ readonly class UpdateDebtUseCase
             )
         );
 
-        $this->debtWriteRepository->save($debt);
+        TransactionCreated::dispatch($transaction);
     }
 }

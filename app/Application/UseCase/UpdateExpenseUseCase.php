@@ -7,7 +7,6 @@ namespace App\Application\UseCase;
 use App\Domain\Entity\Payer;
 use App\Domain\Entity\Debtor;
 use App\Domain\Entity\Expense;
-use App\Domain\Enum\ActivityLogActionTypeEnum;
 use Illuminate\Support\Facades\DB;
 use App\Infrastrstructure\API\DTO\ExpenseDTO;
 use App\Domain\Repository\GroupReadRepositoryInterface;
@@ -21,13 +20,11 @@ readonly class UpdateExpenseUseCase
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
      * @param CurrencyConverterService $currencyConverterService
-     * @param LogActivityUseCase $logActivityUseCase
      */
     public function __construct(
         private GroupReadRepositoryInterface $groupReadRepository,
         private GroupWriteRepositoryInterface $groupWriteRepository,
         private CurrencyConverterService $currencyConverterService,
-        private LogActivityUseCase $logActivityUseCase
     ) {}
 
     /**
@@ -78,13 +75,6 @@ readonly class UpdateExpenseUseCase
             $expense->distributeDebts($this->currencyConverterService, $group->finalCurrency);
 
             $this->groupWriteRepository->save($group);
-
-            $this->logActivityUseCase->execute(
-                $customerId,
-                $group->id,
-                ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
-                ['expense_id' => $expense->id]
-            );
 
             return $expense;
         });

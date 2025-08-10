@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
-use App\Domain\Enum\DebtStatusEnum;
+use App\Domain\Enum\StatusEnum;
 
 class Debt
 {
@@ -12,18 +12,23 @@ class Debt
      * @param float $amount
      * @param string $currency
      * @param string $groupId
-     * @param int $from
-     * @param int $to
-     * @param DebtStatusEnum $status
+     * @param Customer $from
+     * @param Customer $to
+     * @param StatusEnum $status
      * @param int|null $id
      */
     public function __construct(
         public float $amount,
         public string $currency,
         public string $groupId,
-        public int $from,
-        public int $to,
-        public DebtStatusEnum $status = DebtStatusEnum::PENDING,
+        public Customer $from,
+        public Customer $to,
+        public StatusEnum $status = StatusEnum::PENDING,
         public ?int $id = null,
     ) {}
+
+    public function subAmount(float $amount): void
+    {
+        $this->amount = (float)bcsub((string)$this->amount, (string)$amount, 2);
+    }
 }

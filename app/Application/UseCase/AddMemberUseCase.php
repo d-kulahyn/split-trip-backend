@@ -16,13 +16,11 @@ readonly class AddMemberUseCase
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param CustomerReadRepositoryInterface $customerReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
-     * @param LogActivityUseCase $logActivityUseCase
      */
     public function __construct(
         private GroupReadRepositoryInterface $groupReadRepository,
         private CustomerReadRepositoryInterface $customerReadRepository,
         private GroupWriteRepositoryInterface $groupWriteRepository,
-        public LogActivityUseCase $logActivityUseCase
     ) {}
 
     /**
@@ -39,11 +37,5 @@ readonly class AddMemberUseCase
         $group = $this->groupReadRepository->findById($groupId)->addMember($newMember);
 
         $this->groupWriteRepository->save($group);
-
-        $this->logActivityUseCase->execute(
-            $newMemberId,
-            $group->id,
-            ActivityLogActionTypeEnum::MEMBER_ADDED_TO_GROUP
-        );
     }
 }

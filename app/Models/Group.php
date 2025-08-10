@@ -31,6 +31,10 @@ class Group extends Model
         'avatar'
     ];
 
+    protected $casts = [
+        'id' => 'string',
+    ];
+
     /**
      * @var bool
      */
@@ -76,7 +80,7 @@ class Group extends Model
      */
     public function members(): BelongsToMany
     {
-        return $this->belongsToMany(Customer::class);
+        return $this->belongsToMany(Customer::class, 'customer_group', 'group_id', 'customer_id');
     }
 
     /**

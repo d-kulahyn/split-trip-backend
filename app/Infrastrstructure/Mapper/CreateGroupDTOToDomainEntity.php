@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Infrastrstructure\Mapper;
 
+use App\Domain\Entity\Expense;
+use App\Domain\Entity\Group;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
+use App\Domain\Repository\DebtWriteRepositoryInterface;
+use App\Domain\Repository\TransactionWriteRepositoryInterface;
 use App\Infrastrstructure\API\DTO\RequestGroupDTO;
 
 class CreateGroupDTOToDomainEntity
@@ -14,15 +18,17 @@ class CreateGroupDTOToDomainEntity
      * @param RequestGroupDTO $groupDTO
      * @param string|null $id
      *
-     * @return \App\Domain\Entity\Group
+     * @return Group
      */
-    public static function toEntity(RequestGroupDTO $groupDTO, ?string $id = null): \App\Domain\Entity\Group
+    public static function toEntity(RequestGroupDTO $groupDTO, ?string $id = null): Group
     {
-        $domainGroup = new \App\Domain\Entity\Group(
+        $domainGroup = new Group(
             $groupDTO->name,
             $groupDTO->category,
             $groupDTO->created_by,
             $groupDTO->currency,
+            app(DebtWriteRepositoryInterface::class),
+            app(TransactionWriteRepositoryInterface::class),
             true,
             $id
         );
@@ -36,7 +42,7 @@ class CreateGroupDTOToDomainEntity
         }
 
         foreach ($groupDTO->expenses as $expense) {
-            $domainGroup->addExpense(new \App\Domain\Entity\Expense(
+            $domainGroup->addExpense(new Expense(
                 $expense->category,
                 $expense->createdAt,
                 $expense->finalCurrency,

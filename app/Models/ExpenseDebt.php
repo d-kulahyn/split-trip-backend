@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Domain\Enum\DebtStatusEnum;
+use App\Domain\Enum\StatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +35,7 @@ class ExpenseDebt extends Model
     protected function casts(): array
     {
         return [
-            'status' => DebtStatusEnum::class,
+            'status' => StatusEnum::class,
             'amount' => 'float',
         ];
     }

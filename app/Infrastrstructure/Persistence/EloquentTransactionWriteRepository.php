@@ -14,17 +14,22 @@ class EloquentTransactionWriteRepository implements TransactionWriteRepositoryIn
      *
      * @return void
      */
-    public function save(Transaction $transaction): void
+    public function save(Transaction $transaction): Transaction
     {
-        \App\Models\Transaction::query()->updateOrCreate(
+        $eloquentTransaction = \App\Models\Transaction::query()->updateOrCreate(
             ['id' => $transaction->id],
             [
                 'amount'   => $transaction->amount,
                 'currency' => $transaction->currency,
-                'from'     => $transaction->from,
-                'to'       => $transaction->to,
+                'from'     => $transaction->from->id,
+                'to'       => $transaction->to->id,
                 'group_id' => $transaction->groupId,
+                'status'   => $transaction->status,
             ]
         );
+
+        $transaction->id = $eloquentTransaction->id;
+
+        return $transaction;
     }
 }

@@ -72,11 +72,13 @@ class Customer extends Data
     /**
      * @param Balance $balance
      *
-     * @return void
+     * @return $this
      */
-    public function setBalance(Balance $balance): void
+    public function setBalance(Balance $balance): static
     {
         $this->balance = $balance;
+
+        return $this;
     }
 
     /**

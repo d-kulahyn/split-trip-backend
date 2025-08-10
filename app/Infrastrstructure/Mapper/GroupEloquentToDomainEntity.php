@@ -8,6 +8,9 @@ use App\Domain\Entity\Debt;
 use App\Domain\Entity\Debtor;
 use App\Domain\Entity\Expense;
 use App\Domain\Entity\Payer;
+use App\Domain\Repository\DebtWriteRepositoryInterface;
+use App\Domain\Repository\TransactionWriteRepositoryInterface;
+use App\Infrastrstructure\Persistence\Mappers\EloquentCustomerMapper;
 use App\Models\Group;
 use App\Models\ExpenseDebt;
 use App\Models\Payer as PayerModel;
@@ -23,20 +26,22 @@ class GroupEloquentToDomainEntity
     public static function toEntity(Group $groupEloquent): \App\Domain\Entity\Group
     {
         $domainGroup = new \App\Domain\Entity\Group(
-            name         : $groupEloquent->name,
-            category     : $groupEloquent->category,
-            createdBy    : $groupEloquent->created_by,
-            finalCurrency: $groupEloquent->final_currency,
-            simplifyDebts: $groupEloquent->simplify_debts,
-            id           : $groupEloquent->id,
-            avatar       : $groupEloquent->avatar,
-            debts      : $groupEloquent->debts->map(function (ExpenseDebt $debt) {
+            name                      : $groupEloquent->name,
+            category                  : $groupEloquent->category,
+            createdBy                 : $groupEloquent->created_by,
+            finalCurrency             : $groupEloquent->final_currency,
+            debtWriteRepository       : app(DebtWriteRepositoryInterface::class),
+            transactionWriteRepository: app(TransactionWriteRepositoryInterface::class),
+            simplifyDebts             : $groupEloquent->simplify_debts,
+            id                        : $groupEloquent->id,
+            avatar                    : $groupEloquent->avatar,
+            debts                     : $groupEloquent->debts->map(function (ExpenseDebt $debt) {
                 return new Debt(
                     amount  : (float)$debt->amount,
                     currency: $debt->currency,
                     groupId : $debt->group_id,
-                    from    : $debt->from,
-                    to      : $debt->to,
+                    from    : EloquentCustomerMapper::map($debt->debtor),
+                    to      : EloquentCustomerMapper::map($debt->creditor),
                     status  : $debt->status,
                     id      : $debt->id
                 );
@@ -47,8 +52,6 @@ class GroupEloquentToDomainEntity
             foreach ($groupEloquent->members as $member) {
                 $domainGroup->addMember(CustomerEloquentToDomainEntity::toEntity($member));
             }
-
-            $domainGroup->addMember(CustomerEloquentToDomainEntity::toEntity($groupEloquent->owner));
         }
 
         if ($groupEloquent->relationLoaded('expenses')) {
@@ -65,30 +68,30 @@ class GroupEloquentToDomainEntity
                             amount  : (float)$debt->amount,
                             currency: $debt->currency,
                             groupId : $debt->group_id,
-                            from    : $debt->from,
-                            to      : $debt->to,
+                            from    : EloquentCustomerMapper::map($debt->debtor),
+                            to      : EloquentCustomerMapper::map($debt->creditor),
                             status  : $debt->status,
                             id      : $debt->id
                         );
                     })->toArray(),
                     debtors    : $expense->debtors->map(function (DebtorModel $debtor) {
                         return new Debtor(
-                            amount  : $debtor->amount,
-                            debtorId: $debtor->debtor_id,
-                            currency: $debtor->currency,
-                            id      : $debtor->id,
-                            name    : $debtor->customer->name,
-                            avatarColor  : $debtor->customer->avatar_color,
+                            amount     : $debtor->amount,
+                            debtorId   : $debtor->debtor_id,
+                            currency   : $debtor->currency,
+                            id         : $debtor->id,
+                            name       : $debtor->customer->name,
+                            avatarColor: $debtor->customer->avatar_color,
                         );
                     })->toArray(),
                     payers     : $expense->payers->map(function (PayerModel $payer) {
                         return new Payer(
-                            amount  : $payer->amount,
-                            currency: $payer->currency,
-                            payerId : $payer->payer_id,
-                            id      : $payer->id,
-                            avatarColor  : $payer->customer->avatar_color,
-                            name    : $payer->customer->name,
+                            amount     : $payer->amount,
+                            currency   : $payer->currency,
+                            payerId    : $payer->payer_id,
+                            id         : $payer->id,
+                            avatarColor: $payer->customer->avatar_color,
+                            name       : $payer->customer->name,
                         );
                     })->toArray(),
                 ));

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
-use App\Domain\Enum\DebtStatusEnum;
+use App\Application\DebtException;
+use App\Domain\Enum\StatusEnum;
 use App\Domain\Exception\GroupHasDebtsException;
+use App\Domain\Repository\DebtWriteRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
+use App\Domain\Repository\TransactionWriteRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use App\Domain\Services\DebtDistributor;
+use App\Events\GroupDebtAmountUpdated;
 
 class Group
 {
@@ -18,11 +22,13 @@ class Group
      * @param string $category
      * @param int $createdBy
      * @param string $finalCurrency
+     * @param DebtWriteRepositoryInterface $debtWriteRepository
+     * @param TransactionWriteRepositoryInterface $transactionWriteRepository
      * @param bool $simplifyDebts
      * @param string|null $id
      * @param string|null $avatar
      * @param array $debts
-     * @param array $members
+     * @param array<Customer> $members
      * @param array $expenses
      * @param array $expensesToDelete
      */
@@ -31,10 +37,12 @@ class Group
         public string $category,
         public int $createdBy,
         public string $finalCurrency,
+        public DebtWriteRepositoryInterface $debtWriteRepository,
+        public TransactionWriteRepositoryInterface $transactionWriteRepository,
         public bool $simplifyDebts = true,
         public ?string $id = null,
         public ?string $avatar = null,
-        public array $debts = [],
+        private readonly array $debts = [],
         private array $members = [],
         private array $expenses = [],
         private array $expensesToDelete = []
@@ -47,13 +55,7 @@ class Group
      */
     public function addMember(Customer $member): self
     {
-        if ($member->id) {
-            $this->members[$member->id] = $member;
-
-            return $this;
-        }
-
-        $this->members[] = $member;
+        $this->members[$member->id] = $member;
 
         return $this;
     }
@@ -65,7 +67,7 @@ class Group
      */
     public function hasMember(int $memberId): bool
     {
-        return isset($this->members[$memberId]);
+        return (bool)count(array_filter($this->members, fn(Customer $member) => $member->id === $memberId));
     }
 
     /**
@@ -75,12 +77,6 @@ class Group
      */
     public function addExpense(Expense $expense): void
     {
-        if ($expense->id) {
-            $this->expenses[$expense->id] = $expense;
-
-            return;
-        }
-
         $this->expenses[] = $expense;
     }
 
@@ -90,6 +86,22 @@ class Group
     public function getMembers(): array
     {
         return $this->members;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Customer|null
+     */
+    public function getMember(int $id): ?Customer
+    {
+        foreach ($this->members as $member) {
+            if ($member->id === $id) {
+                return $member;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -140,16 +152,16 @@ class Group
             }
 
             if (!isset($balances[$memberId])) {
-                $balances[$memberId] = new Balance();
+                $balances[$memberId] = new Balance(customerId: $memberId);
             }
 
             foreach ($this->getDebts() as $debt) {
-                if ($debt->status === DebtStatusEnum::PAID) {
+                if ($debt->status === StatusEnum::PAID) {
 
                     continue;
                 }
 
-                if ($debt->from === $memberId) {
+                if ($debt->from->id === $memberId) {
                     $balances[$memberId]->balance = (float)bcsub(
                         (string)$balances[$memberId]->balance,
                         (string)$debt->amount
@@ -162,7 +174,7 @@ class Group
                     continue;
                 }
 
-                if ($debt->to === $memberId) {
+                if ($debt->to->id === $memberId) {
                     $balances[$memberId]->balance = (float)bcadd(
                         (string)$balances[$memberId]->balance,
                         (string)$debt->amount
@@ -193,11 +205,39 @@ class Group
      */
     public function distributeDebts(): array
     {
+        if (empty($this->getBalances())) return [];
+
         $balances = collect($this->getBalances());
         /** @var DebtDistributor $debtsDistributor */
         $debtsDistributor = app(DebtDistributor::class);
 
         return $debtsDistributor->distributeDebts($balances, $this->finalCurrency, $this->id);
+    }
+
+    /**
+     * @throws DebtException
+     */
+    public function updateDebtAmount(int $debtId, float $amount): void
+    {
+        $debt = $this->getDebtById($debtId);
+
+        if (!$debt) {
+            throw new DebtException('Debt not found.');
+        }
+
+        if ($amount <= 0 || $amount > $debt->amount) {
+            throw new DebtException('Invalid amount provided.');
+        }
+
+        $debt->subAmount($amount);
+
+        if ($debt->amount === 0.00) {
+            $debt->status = StatusEnum::PAID;
+        }
+
+        $this->debtWriteRepository->save($debt);
+
+        GroupDebtAmountUpdated::dispatch($debt, $this);
     }
 
     /**
@@ -242,6 +282,28 @@ class Group
         }
 
         return array_merge($this->debts, $debts);
+    }
+
+    public function getDebtById(int $id): ?Debt
+    {
+        foreach ($this->getDebts() as $debt) {
+            if ($debt->id === $id) {
+                return $debt;
+            }
+        }
+
+        return null;
+    }
+
+    public function getDebtBetween(int $fromId, int $toId): ?Debt
+    {
+        foreach ($this->getDebts() as $debt) {
+            if ($debt->from->id === $fromId && $debt->to->id === $toId) {
+                return $debt;
+            }
+        }
+
+        return null;
     }
 
     /**

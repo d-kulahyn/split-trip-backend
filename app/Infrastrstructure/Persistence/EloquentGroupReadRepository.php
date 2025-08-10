@@ -35,15 +35,21 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
 
     /**
      * @param string $id
+     * @param array|null $with
      *
      * @return \App\Domain\Entity\Group|null
      */
-    public function findById(string $id): ?\App\Domain\Entity\Group
+    public function findById(string $id, ?array $with = null): ?\App\Domain\Entity\Group
     {
-        $groupEloquent = Group::with([
-            'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
-            'members'
-        ])->find($id);
+        if ($with === null) {
+            $with = [
+                'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
+                'members',
+                'debts',
+            ];
+        }
+
+        $groupEloquent = Group::with($with)->find($id);
 
         if (!$groupEloquent) {
 
@@ -91,5 +97,16 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
         $group = Group::find($groupId);
 
         return $group->members->toArray();
+    }
+
+    /**
+     * @param string $groupId
+     * @param int $customerId
+     *
+     * @return bool
+     */
+    public function isAMember(string $groupId, int $customerId): bool
+    {
+        return Group::find()->members()->where('customer_id', $customerId)->exists();
     }
 }

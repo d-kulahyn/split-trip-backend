@@ -6,5 +6,5 @@ use App\Domain\Entity\Transaction;
 
 interface TransactionWriteRepositoryInterface
 {
-    public function save(Transaction $transaction);
+    public function save(Transaction $transaction): Transaction;
 }

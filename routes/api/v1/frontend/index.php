@@ -1,5 +1,7 @@
 <?php
 
+use App\Infrastrstructure\API\Controllers\ActivityController;
+use App\Infrastrstructure\API\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 use App\Infrastrstructure\API\Controllers\CurrencyController;
 
@@ -12,6 +14,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('currencies/{currency}/rates', [CurrencyController::class, 'rates']);
     Route::get('currencies/codes', [CurrencyController::class, 'codes']);
+    Route::get('activities', [ActivityController::class, 'index']);
+    Route::get('transactions', [TransactionController::class, 'index']);
+    Route::patch('transactions/{transaction}/status', [TransactionController::class, 'status']);
 });
 
 require base_path('routes/api/v1/common.php');

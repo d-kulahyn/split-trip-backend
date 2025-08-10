@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastrstructure\API\DTO;
 
-use App\Domain\Enum\DebtStatusEnum;
+use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\API\Rules\MembersInGroup;
 use App\Infrastrstructure\API\Rules\PayersAndDebtorsAmountMatch;
@@ -26,7 +26,7 @@ class ExpenseDTO extends Data
      * @param array $debtors
      * @param array $payers
      * @param int $created_at
-     * @param DebtStatusEnum $status
+     * @param StatusEnum $status
      */
     public function __construct(
         public readonly string $description,
@@ -35,7 +35,7 @@ class ExpenseDTO extends Data
         public readonly array $debtors,
         public readonly array $payers,
         public readonly int $created_at,
-        public readonly DebtStatusEnum $status = DebtStatusEnum::PENDING,
+        public readonly StatusEnum $status = StatusEnum::PENDING,
     ) {}
 
     /**
@@ -67,7 +67,7 @@ class ExpenseDTO extends Data
                 new MembersInGroup($group),
                 new PayersAndDebtorsAmountMatch($payers, $debtors),
             ],
-            'status'           => ['required', 'string', 'in:'.implode(',', DebtStatusEnum::values())],
+            'status'           => ['required', 'string', 'in:'.implode(',', StatusEnum::values())],
             'payers.*.id'      => ['required', 'exists:customers,id'],
             'currency'         => ['required', 'string'],
             'payers.*.amount'  => ['required', 'numeric', 'min:0'],

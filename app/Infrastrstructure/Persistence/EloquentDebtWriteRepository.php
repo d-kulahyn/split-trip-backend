@@ -22,8 +22,8 @@ class EloquentDebtWriteRepository implements DebtWriteRepositoryInterface
             [
                 'amount'   => $debt->amount,
                 'currency' => $debt->currency,
-                'from'     => $debt->from,
-                'to'       => $debt->to,
+                'from'     => $debt->from->id,
+                'to'       => $debt->to->id,
                 'status'   => $debt->status->value,
             ]
         );

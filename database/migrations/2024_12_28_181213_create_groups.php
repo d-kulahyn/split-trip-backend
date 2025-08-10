@@ -48,7 +48,7 @@ return new class extends Migration
             $table->unsignedInteger('from')->nullable(false);
             $table->unsignedInteger('expense_id')->nullable()->default(null);
             $table->unsignedInteger('to')->nullable(false);
-            $table->string('status')->nullable(false)->default(\App\Domain\Enum\DebtStatusEnum::PENDING->value);
+            $table->string('status')->nullable(false)->default(\App\Domain\Enum\StatusEnum::PENDING->value);
             $table->timestamps();
 
             $table->foreignUuid('group_id')->constrained()->onDelete('cascade');

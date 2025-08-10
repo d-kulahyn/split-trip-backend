@@ -116,7 +116,8 @@ class Expense
             $balances[$debtor->debtorId] = new Balance(
                 owe    : $debtor->amount,
                 paid   : 0,
-                balance: 0
+                balance: 0,
+                customerId: $debtor->debtorId,
             );
         }
 
@@ -125,7 +126,8 @@ class Expense
                 $balances[$payer->payerId] = new Balance(
                     owe    : 0,
                     paid   : $payer->amount,
-                    balance: 0
+                    balance: 0,
+                    customerId: $payer->payerId,
                 );
             } else {
                 $balances[$payer->payerId]->paid = $payer->amount;

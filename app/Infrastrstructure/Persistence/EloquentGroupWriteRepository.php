@@ -63,17 +63,18 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                 $expense->id = $eloquentExpense->id;
 
                 foreach ($expense->getDebts() as $debt) {
-                    ExpenseDebt::query()->updateOrCreate(
+                    $eloquentDebt = ExpenseDebt::query()->updateOrCreate(
                         ['id' => $debt->id],
                         [
                             'amount'     => $debt->amount,
                             'currency'   => $debt->currency,
-                            'from'       => $debt->from,
-                            'to'         => $debt->to,
+                            'from'       => $debt->from->id,
+                            'to'         => $debt->to->id,
                             'expense_id' => $eloquentExpense->id,
                             'group_id'   => $eloquentGroup->id,
                         ]
                     );
+                    $debt->id = $eloquentDebt->id;
                 }
 
                 foreach ($expense->getPayers() as $payer) {
@@ -105,15 +106,14 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             if ($group->simplifyDebts) {
                 $distributedDebts = $group->distributeDebts();
                 $eloquentGroup->debts()->delete();
-                $eloquentGroup->expenses->each(fn($expense) => $expense->debts()->delete());
 
                 $insert = [];
                 foreach ($distributedDebts as $debt) {
                     $insert[] = [
                         'amount'   => $debt->amount,
                         'currency' => $debt->currency,
-                        'from'     => $debt->from,
-                        'to'       => $debt->to,
+                        'from'     => $debt->from->id,
+                        'to'       => $debt->to->id,
                         'group_id' => $group->id,
                     ];
                 }

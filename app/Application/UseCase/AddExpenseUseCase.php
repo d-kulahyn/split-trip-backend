@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase;
 
+use App\Domain\Entity\Group;
 use App\Domain\Entity\Payer;
 use App\Domain\Entity\Debtor;
 use App\Domain\Entity\Expense;
 use App\Domain\Enum\ActivityLogActionTypeEnum;
+use App\Domain\Repository\BalanceWriteRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use App\Infrastrstructure\API\DTO\ExpenseDTO;
 use App\Domain\Repository\GroupReadRepositoryInterface;
@@ -21,13 +23,13 @@ readonly class AddExpenseUseCase
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
      * @param CurrencyConverterService $currencyConverterService
-     * @param LogActivityUseCase $logActivityUseCase
+     * @param BalanceWriteRepositoryInterface $balanceWriteRepository
      */
     public function __construct(
         private GroupReadRepositoryInterface $groupReadRepository,
         private GroupWriteRepositoryInterface $groupWriteRepository,
         private CurrencyConverterService $currencyConverterService,
-        private LogActivityUseCase $logActivityUseCase
+        private BalanceWriteRepositoryInterface $balanceWriteRepository,
     ) {}
 
     /**
@@ -37,9 +39,9 @@ readonly class AddExpenseUseCase
      *
      * @throws UnauthorizedGroupActionException
      *
-     * @return Expense
+     * @return Group
      */
-    public function execute(ExpenseDTO $expenseDTO, string $groupId, int $customerId): Expense
+    public function execute(ExpenseDTO $expenseDTO, string $groupId, int $customerId): Group
     {
         $result = DB::transaction(function () use ($expenseDTO, $groupId, $customerId) {
             $group = $this->groupReadRepository->findById($groupId);
@@ -73,19 +75,11 @@ readonly class AddExpenseUseCase
             }
 
             $expense->distributeDebts($this->currencyConverterService, $group->finalCurrency);
-
             $group->addExpense($expense);
-
             $this->groupWriteRepository->save($group);
+            $this->balanceWriteRepository->update($group->getBalances(), $group->getMember($customerId));
 
-            $this->logActivityUseCase->execute(
-                $customerId,
-                $group->id,
-                ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
-                ['expense_id' => $expense->id]
-            );
-
-            return $expense;
+            return $group;
         });
 
         if (!$result) {

@@ -12,6 +12,7 @@ use App\Application\UseCase\RemoveMemberUseCase;
 use App\Application\UseCase\ToggleSimplifyDebtsUseCase;
 use App\Application\UseCase\UpdateExpenseUseCase;
 use App\Application\UseCase\UpdateGroupUseCase;
+use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
 use App\Infrastrstructure\API\DTO\ExpenseDTO;
@@ -46,6 +47,7 @@ readonly class GroupController
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
      * @param ToggleSimplifyDebtsUseCase $toggleSimplifyDebtsUseCase
+     * @param CustomerReadRepositoryInterface $customerReadRepository
      */
     public function __construct(
         public CreateGroupUseCase $createGroupUseCase,
@@ -58,6 +60,7 @@ readonly class GroupController
         public GroupReadRepositoryInterface $groupReadRepository,
         public GroupWriteRepositoryInterface $groupWriteRepository,
         public ToggleSimplifyDebtsUseCase $toggleSimplifyDebtsUseCase,
+        public CustomerReadRepositoryInterface $customerReadRepository
     ) {}
 
     /**
@@ -105,7 +108,7 @@ readonly class GroupController
     {
         $this->toggleSimplifyDebtsUseCase->execute($group->id);
 
-        return response()->json(['id' => 'Group updated successfully'], ResponseAlias::HTTP_CREATED);
+        return response()->json(['message' => 'Group updated successfully'], ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -139,10 +142,7 @@ readonly class GroupController
             return response()->json(['message' => $e->getMessage()], ResponseAlias::HTTP_FORBIDDEN);
         }
 
-        return response(
-            new GroupResource($this->groupReadRepository->findById($group->id)),
-            ResponseAlias::HTTP_CREATED
-        );
+        return response(new GroupResource($this->groupReadRepository->findById($group->id)), ResponseAlias::HTTP_CREATED);
     }
 
     /**

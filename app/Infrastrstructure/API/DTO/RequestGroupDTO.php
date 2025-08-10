@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastrstructure\API\DTO;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
 
 class RequestGroupDTO extends Data
 {
@@ -13,19 +12,13 @@ class RequestGroupDTO extends Data
      * @param string $name
      * @param string $category
      * @param int|null $created_by
-     * @param array $members
-     * @param array $expenses
-     * @param bool|Optional $simplify_debts
      * @param string $currency
      */
     public function __construct(
         public string $name,
         public string $category,
         public ?int $created_by = null,
-        public array $members = [],
-        public array $expenses = [],
-        public bool $simplify_debts = true,
-        public string $currency = 'EUR',
+        public string $currency = 'USD',
     ) {}
 
     /**

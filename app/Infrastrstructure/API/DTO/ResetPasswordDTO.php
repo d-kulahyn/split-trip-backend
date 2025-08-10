@@ -14,7 +14,7 @@ class ResetPasswordDTO extends Data
     public static function rules(...$args): array
     {
         return [
-            'email' => ['required', 'email', 'exists:users,email']
+            'email' => ['required', 'email', 'exists:customers,email']
         ];
     }
 }
