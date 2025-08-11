@@ -39,22 +39,22 @@ class GroupResource extends JsonResource
         $overallBalances = array_map(fn(Customer $customer) => $customer->getBalance(), $overallBalances);
 
         return [
-            'debts'           => DebtResource::collection($resource->getDebts()),
-            'id'              => $resource->id,
-            'name'            => $resource->name,
-            'category'        => $resource->category,
-            'final_currency'  => $resource->finalCurrency,
-            'created_by'      => $resource->createdBy,
-            'members'         => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
-            'currencies'      => $currencyReadRepository->codes(),
-            'expenses'        => ExpenseResource::collection($resource->getExpenses()),
-            'myBalance'       => $balances[auth()->id()],
-            'simplify_debts'  => $resource->simplifyDebts,
-            'balances'        => $balances,
-            'rates'           => $currencyReadRepository->rates($resource->finalCurrency),
-            'avatar'          => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
-            'overallBalance'  => $members[request()->user()->id]->getBalance(),
-            'overallBalances' => $overallBalances,
+            'debts'            => DebtResource::collection($resource->getDebts()),
+            'id'               => $resource->id,
+            'name'             => $resource->name,
+            'category'         => $resource->category,
+            'final_currency'   => $resource->finalCurrency,
+            'created_by'       => $resource->createdBy,
+            'members'          => $resource->hasMembers() ? CustomerResource::collection($resource->getMembers()) : [],
+            'currencies'       => $currencyReadRepository->codes(),
+            'expenses'         => ExpenseResource::collection($resource->getExpenses()),
+            'my_balance'       => $balances[auth()->id()],
+            'simplify_debts'   => $resource->simplifyDebts,
+            'balances'         => $balances,
+            'rates'            => $currencyReadRepository->rates($resource->finalCurrency),
+            'avatar'           => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
+            'overall_balance'  => $members[request()->user()->id]->getBalance(),
+            'overall_balances' => $overallBalances,
         ];
     }
 }
