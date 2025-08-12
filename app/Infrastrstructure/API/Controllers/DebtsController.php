@@ -8,6 +8,7 @@ use App\Application\UseCase\UpdateDebtUseCase;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\API\DTO\DebtDTO;
 use App\Infrastrstructure\API\Resource\GroupResource;
+use App\Infrastrstructure\API\Resource\TransactionResource;
 use App\Models\ExpenseDebt;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -35,7 +36,7 @@ readonly class DebtsController
 
         return response([
             "group"       => new GroupResource($this->groupReadRepository->findById($debt->group_id)),
-            "transaction" => $transaction,
+            "transaction" => new TransactionResource($transaction),
         ], ResponseAlias::HTTP_CREATED);
     }
 }
