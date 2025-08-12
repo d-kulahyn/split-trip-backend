@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Application\UseCase;
 
 use App\Domain\Entity\Transaction;
+use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Events\TransactionCreated;
 use App\Infrastrstructure\API\DTO\DebtDTO;
-use App\Domain\Listener\TransactionCreatedListener;
 use App\Domain\Repository\DebtReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
 
 readonly class UpdateDebtUseCase
 {
     public function __construct(
+        private GroupReadRepositoryInterface $groupReadRepository,
         private DebtReadRepositoryInterface $debtReadRepository,
         private TransactionWriteRepositoryInterface $transactionWriteRepository
     ) {}
@@ -21,10 +22,11 @@ readonly class UpdateDebtUseCase
     /**
      * @param int $id
      * @param DebtDTO $debtDTO
+     * @param string $groupId
      *
      * @return void
      */
-    public function execute(int $id, DebtDTO $debtDTO): void
+    public function execute(int $id, DebtDTO $debtDTO, string $groupId): Transaction
     {
         $debt = $this->debtReadRepository->findById($id);
 
@@ -39,9 +41,12 @@ readonly class UpdateDebtUseCase
                 amount  : $debtDTO->amount,
                 currency: $debt->currency,
                 groupId : $debt->groupId,
+                groupName: $this->groupReadRepository->getNameById($groupId),
             )
         );
 
         TransactionCreated::dispatch($transaction);
+
+        return $transaction;
     }
 }

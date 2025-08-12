@@ -27,13 +27,15 @@ readonly class DebtsController
      * @param ExpenseDebt $debt
      * @param DebtDTO $debtDTO
      *
-     * @throws \App\Application\DebtException
      * @return Response
      */
     public function update(ExpenseDebt $debt, DebtDTO $debtDTO): Response
     {
-        $this->updateDebtStatusUseCase->execute($debt->id, $debtDTO);
+        $transaction = $this->updateDebtStatusUseCase->execute($debt->id, $debtDTO, $debt->group_id);
 
-        return response(new GroupResource($this->groupReadRepository->findById($debt->group_id)), ResponseAlias::HTTP_CREATED);
+        return response([
+            "group"       => new GroupResource($this->groupReadRepository->findById($debt->group_id)),
+            "transaction" => $transaction,
+        ], ResponseAlias::HTTP_CREATED);
     }
 }

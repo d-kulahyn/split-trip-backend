@@ -10,4 +10,5 @@ interface GroupReadRepositoryInterface
     public function list(int $customerId): array;
     public function members(string $groupId): array;
     public function isAMember(string $groupId, int $customerId): bool;
+    public function getNameById(string $id): ?string;
 }

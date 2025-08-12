@@ -110,4 +110,14 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
     {
         return Group::find()->members()->where('customer_id', $customerId)->exists();
     }
+
+    /**
+     * @param string $id
+     *
+     * @return string|null
+     */
+    public function getNameById(string $id): ?string
+    {
+        return Group::find($id)?->name;
+    }
 }
