@@ -14,25 +14,23 @@ use Illuminate\Support\Collection;
 class EloquentTransactionReadRepository implements TransactionReadRepositoryInterface
 {
 
-    public function list(StatusEnum $status, int $to, array $with = []): Collection
+    public function list(StatusEnum $status, int $to): Collection
     {
         return \App\Models\Transaction::query()
             ->where('status', $status->value)
             ->where('to', $to)
-            ->with($with)
+            ->with(['group' => fn($query) => $query->select(['id', 'name'])])
             ->get()
             ->map(function (\App\Models\Transaction $transaction) {
                 return new Transaction(
-                    from    : CustomerEloquentToDomainEntity::toEntity($transaction->fromC),
-                    to      : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
-                    amount  : $transaction->amount,
-                    currency: $transaction->currency,
-                    groupId : $transaction->group_id,
-                    id      : $transaction->id,
-                    group   : $transaction->relationLoaded('group')
-                        ? EloquentGroupMapper::map($transaction->group)
-                        : null,
-                    status  : $transaction->status,
+                    from     : CustomerEloquentToDomainEntity::toEntity($transaction->fromC),
+                    to       : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
+                    amount   : $transaction->amount,
+                    currency : $transaction->currency,
+                    groupId  : $transaction->group_id,
+                    groupName: $transaction->group->name,
+                    id       : $transaction->id,
+                    status   : $transaction->status,
                 );
             });
     }

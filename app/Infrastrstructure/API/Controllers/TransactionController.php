@@ -25,7 +25,7 @@ readonly class TransactionController
 
     public function index(): AnonymousResourceCollection
     {
-        return TransactionResource::collection($this->transactionReadRepository->list(StatusEnum::PENDING, auth()->id(), ['group']));
+        return TransactionResource::collection($this->transactionReadRepository->list(StatusEnum::PENDING, auth()->id()));
     }
 
     public function status(Transaction $transaction, UpdateTransactionStatusDTO $updateTransactionStatusDTO): GroupResource

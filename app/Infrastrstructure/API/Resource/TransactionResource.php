@@ -17,13 +17,14 @@ class TransactionResource extends JsonResource
         $resource = $this->resource;
 
         return [
-            'id'       => $resource->id,
-            'from'     => new CustomerResource($resource->from),
-            'to'       => new CustomerResource($resource->to),
-            'group'    => new GroupResource($resource->group),
-            'amount'   => $resource->amount,
-            'currency' => $resource->currency,
-            'status'   => $resource->status->value,
+            'id'         => $resource->id,
+            'from'       => new CustomerResource($resource->from),
+            'to'         => new CustomerResource($resource->to),
+            'group_id'   => $resource->groupId,
+            'group_name' => $resource->groupName,
+            'amount'     => $resource->amount,
+            'currency'   => $resource->currency,
+            'status'     => $resource->status->value,
         ];
     }
 }
