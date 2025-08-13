@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\ActivityLog;
+use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 
 class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepositoryInterface
@@ -34,5 +35,12 @@ class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepository
         $activity->id = $eloquentActivityLog->id;
 
         return $activity;
+    }
+
+    public function updateStatuses(array $ids, StatusEnum $status): void
+    {
+        \App\Models\ActivityLog::query()
+            ->whereIn('id', $ids)
+            ->update(['status' => $status->value]);
     }
 }

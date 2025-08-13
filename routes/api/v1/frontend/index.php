@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('currencies/{currency}/rates', [CurrencyController::class, 'rates']);
     Route::get('currencies/codes', [CurrencyController::class, 'codes']);
     Route::get('activities', [ActivityController::class, 'index']);
+    Route::get('activities/status/batch', [ActivityController::class, 'statusBatch']);
     Route::get('transactions', [TransactionController::class, 'index']);
     Route::patch('transactions/{transaction}/status', [TransactionController::class, 'status']);
 });
