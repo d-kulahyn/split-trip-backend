@@ -234,32 +234,4 @@ readonly class GroupController
 
         return response()->json(['message' => 'Group deleted successfully'], ResponseAlias::HTTP_OK);
     }
-
-    /**
-     * @param Group $group
-     *
-     * @return JsonResponse
-     */
-    public function uploadAvatar(Group $group): JsonResponse
-    {
-        $validator = Validator::make(request()->all(), [
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()->first()], ResponseAlias::HTTP_BAD_REQUEST);
-        }
-
-        $file = request()->file('avatar');
-
-        $path = $file->storeAs('groups/avatars', $group->id.'.'.$file->extension());
-
-        $group = $this->groupReadRepository->findById($group->id);
-
-        $group->avatar = $path;
-
-        $this->groupWriteRepository->save($group);
-
-        return response()->json(['path' => Storage::url($path)]);
-    }
 }

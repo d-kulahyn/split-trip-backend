@@ -50,7 +50,7 @@ readonly class UpdateTransactionStatusUseCase
             ));
 
             TransactionStatusUpdated::dispatch($transaction);
-            ActivityCreated::dispatch($activityLog);
+            ActivityCreated::dispatch($transaction->from->id, $activityLog);
         });
     }
 }
