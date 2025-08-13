@@ -12,6 +12,7 @@ class ActivityLog
     /**
      * @param int $customerId
      * @param string $groupId
+     * @param string $groupName
      * @param ActivityLogActionTypeEnum $actionType
      * @param Customer|null $customer
      * @param int|null $createdAt
@@ -23,12 +24,12 @@ class ActivityLog
     public function __construct(
         public int $customerId,
         public string $groupId,
+        public string $groupName,
         public ActivityLogActionTypeEnum $actionType,
         public ?Customer $customer = null,
         public ?int $createdAt = null,
         public StatusEnum $status = StatusEnum::PENDING,
         public array $details = [],
-        public ?Group $group = null,
         public ?int $id = null
     ) {}
 }

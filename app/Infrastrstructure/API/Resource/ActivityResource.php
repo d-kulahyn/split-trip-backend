@@ -24,6 +24,7 @@ class ActivityResource extends JsonResource
             'action_type' => $resource->actionType,
             'details'     => $resource->details,
             'created_at'  => $resource->createdAt,
+            'status'      => $resource->status->value,
             'customer'    => $resource->customer ? new CustomerResource($resource->customer) : null,
         ];
     }
