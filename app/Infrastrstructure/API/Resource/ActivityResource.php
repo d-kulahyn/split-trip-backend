@@ -20,7 +20,7 @@ class ActivityResource extends JsonResource
             'id'          => $resource->id,
             'customer_id' => $resource->customerId,
             'group_id'    => $resource->groupId,
-            'group'       => new GroupResource($resource->group),
+            'group_name'  => $resource->groupName,
             'action_type' => $resource->actionType,
             'details'     => $resource->details,
             'created_at'  => $resource->createdAt,
