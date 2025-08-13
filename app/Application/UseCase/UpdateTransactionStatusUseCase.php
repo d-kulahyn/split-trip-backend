@@ -10,6 +10,7 @@ use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
+use App\Events\ActivityCreated;
 use App\Events\TransactionStatusUpdated;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -33,21 +34,23 @@ readonly class UpdateTransactionStatusUseCase
 
         $transaction->status = $statusEnum;
 
-        DB::transaction(function() use ($transaction, $statusEnum) {
+        DB::transaction(function () use ($transaction, $statusEnum) {
             $this->transactionWriteRepository->save($transaction);
 
-            TransactionStatusUpdated::dispatch($transaction);
-
-            $this->activityLogRepository->save(new ActivityLog(
+            $activityLog = $this->activityLogRepository->save(new ActivityLog(
                 customerId: $transaction->from->id,
                 groupId   : $transaction->groupId,
+                groupName : $transaction->group->name,
                 actionType: ActivityLogActionTypeEnum::TRANSACTION_UPDATED,
                 details   : [
                     'transaction_id' => $transaction->id,
                     'status'         => $statusEnum->value,
+                    'to'             => $transaction->to->id,
                 ],
-                group     : $transaction->group
             ));
+
+            TransactionStatusUpdated::dispatch($transaction);
+            ActivityCreated::dispatch($activityLog);
         });
     }
 }
