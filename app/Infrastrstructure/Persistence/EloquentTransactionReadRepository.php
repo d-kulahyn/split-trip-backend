@@ -39,7 +39,7 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
     {
         $transaction = \App\Models\Transaction::query()
             ->where('id', $id)
-            ->with($with)
+            ->with(['group' => fn($query) => $query->select(['id', 'name'])])
             ->first();
 
         if (!$transaction) {
@@ -51,7 +51,8 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
             to      : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
             amount  : $transaction->amount,
             currency: $transaction->currency,
-            groupId : $transaction->group_id,
+            groupId  : $transaction->group_id,
+            groupName: $transaction->group->name,
             id      : $transaction->id,
             group   : EloquentGroupMapper::map($transaction->group),
             status  : $transaction->status,
