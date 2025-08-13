@@ -54,7 +54,6 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
             groupId  : $transaction->group_id,
             groupName: $transaction->group->name,
             id      : $transaction->id,
-            group   : EloquentGroupMapper::map($transaction->group),
             status  : $transaction->status,
         );
     }
