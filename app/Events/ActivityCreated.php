@@ -20,7 +20,7 @@ class ActivityCreated implements ShouldBroadcastNow
 
     public function broadcastOn(): Channel
     {
-        return new Channel("activities:{$this->customerId}");
+        return new Channel("activity:{$this->customerId}");
     }
 
     public function broadcastAs(): string
