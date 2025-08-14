@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Domain\Entity\Transaction;
+use App\Infrastrstructure\API\Resource\TransactionResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -14,7 +14,7 @@ class TransactionCreated implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public Transaction $transaction,
+        public TransactionResource $transaction,
         public string $groupId
     ) {}
 
