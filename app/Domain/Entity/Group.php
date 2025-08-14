@@ -236,8 +236,6 @@ class Group
         }
 
         $this->debtWriteRepository->save($debt);
-
-        GroupDebtAmountUpdated::dispatch($debt, $this);
     }
 
     /**

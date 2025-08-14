@@ -45,7 +45,7 @@ readonly class UpdateDebtUseCase
             )
         );
 
-        TransactionCreated::dispatch($transaction);
+        TransactionCreated::dispatch($transaction, $groupId);
 
         return $transaction;
     }

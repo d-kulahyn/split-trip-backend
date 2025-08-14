@@ -14,12 +14,13 @@ class TransactionCreated implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public Transaction $transaction
+        public Transaction $transaction,
+        public string $groupId
     ) {}
 
     public function broadcastOn(): Channel
     {
-        return new Channel("transactions");
+        return new Channel("group:{$this->groupId}");
     }
 
     public function broadcastAs(): string
