@@ -10,6 +10,7 @@ use App\Events\TransactionCreated;
 use App\Infrastrstructure\API\DTO\DebtDTO;
 use App\Domain\Repository\DebtReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
+use App\Infrastrstructure\API\Resource\TransactionResource;
 
 readonly class UpdateDebtUseCase
 {
@@ -45,7 +46,7 @@ readonly class UpdateDebtUseCase
             )
         );
 
-        TransactionCreated::dispatch($transaction, $groupId);
+        TransactionCreated::dispatch(new TransactionResource($transaction), $groupId);
 
         return $transaction;
     }
