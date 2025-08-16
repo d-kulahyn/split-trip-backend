@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Domain\Entity\ActivityLog;
+use App\Infrastrstructure\API\Resource\ActivityResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -15,7 +15,7 @@ class ActivityCreated implements ShouldBroadcastNow
 
     public function __construct(
         public int $customerId,
-        public ActivityLog $activityLog
+        public ActivityResource $activityResource
     ) {}
 
     public function broadcastOn(): Channel
