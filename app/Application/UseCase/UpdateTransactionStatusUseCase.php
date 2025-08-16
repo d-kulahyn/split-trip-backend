@@ -38,15 +38,14 @@ readonly class UpdateTransactionStatusUseCase
             $this->transactionWriteRepository->save($transaction);
 
             $activityLog = $this->activityLogRepository->save(new ActivityLog(
-                customerId: $transaction->from->id,
+                customerId: $transaction->to->id,
                 groupId   : $transaction->groupId,
                 groupName : $transaction->groupName,
                 actionType: ActivityLogActionTypeEnum::TRANSACTION_UPDATED,
-                customer  : $transaction->from,
+                customer  : $transaction->to,
                 details   : [
                     'transaction_id' => $transaction->id,
                     'status'         => $statusEnum->value,
-                    'to'             => $transaction->to->id,
                 ]
             ));
 
