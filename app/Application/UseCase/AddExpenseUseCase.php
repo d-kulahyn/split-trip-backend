@@ -98,6 +98,7 @@ readonly class AddExpenseUseCase
                 $group->getMember($customerId),
             );
 
+            //TODO: generate event for expense creation
             $activityLog = $this->activityWriteRepository->save(new ActivityLog(
                 customerId: $customerId,
                 groupId   : $groupId,
@@ -107,7 +108,7 @@ readonly class AddExpenseUseCase
                 details   : ['amount' => $expense->paid($customerId)]
             ));
 
-            foreach ($group->getMemberIds->reject(fn(int $id) => $id !== $customerId)->toArray() as $memberId) {
+            foreach ($group->getMemberIds->reject(fn(int $id) => $id === $customerId)->toArray() as $memberId) {
                 ActivityCreated::dispatch($memberId, new ActivityResource($activityLog));
             }
 
