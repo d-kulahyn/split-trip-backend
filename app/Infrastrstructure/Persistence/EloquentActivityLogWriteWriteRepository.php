@@ -33,6 +33,7 @@ class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepository
         $eloquentActivityLog->save();
 
         $activity->id = $eloquentActivityLog->id;
+        $activity->createdAt = $eloquentActivityLog->created_at;
 
         return $activity;
     }
