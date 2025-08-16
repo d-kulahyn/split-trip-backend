@@ -12,7 +12,6 @@ use App\Domain\Repository\GroupWriteRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use App\Domain\Services\DebtDistributor;
-use App\Events\GroupDebtAmountUpdated;
 
 class Group
 {

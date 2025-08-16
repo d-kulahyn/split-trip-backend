@@ -11,7 +11,7 @@ use App\Domain\Repository\ActivityWriteRepositoryInterface;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
 use App\Events\ActivityCreated;
-use App\Events\TransactionStatusUpdated;
+use App\Infrastrstructure\API\Resource\ActivityResource;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -49,7 +49,7 @@ readonly class UpdateTransactionStatusUseCase
                 ],
             ));
 
-            ActivityCreated::dispatch($transaction->from->id, $activityLog);
+            ActivityCreated::dispatch($transaction->from->id, new ActivityResource($activityLog));
         });
     }
 }

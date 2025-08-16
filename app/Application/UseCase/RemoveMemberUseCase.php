@@ -46,7 +46,7 @@ readonly class RemoveMemberUseCase
         $balances = $group->getBalances($members);
 
         foreach ($balances as $balance) {
-            if ($balance->balance !== 0) {
+            if ($balance->balance != 0) {
                 throw new UnauthorizedGroupActionException('It is impossible to remove a group member with unpaid debts or if they are owed money by someone else.');
             }
         }
