@@ -354,4 +354,11 @@ class Group
 
         return $groupWriteRepository->remove($this);
     }
+
+    public function __get(string $name)
+    {
+        return collect($this->$name());
+
+//        throw new \LogicException("Undefined property: " . static::class . "::$name");
+    }
 }
