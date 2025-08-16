@@ -42,11 +42,12 @@ readonly class UpdateTransactionStatusUseCase
                 groupId   : $transaction->groupId,
                 groupName : $transaction->groupName,
                 actionType: ActivityLogActionTypeEnum::TRANSACTION_UPDATED,
+                customer  : $transaction->from,
                 details   : [
                     'transaction_id' => $transaction->id,
                     'status'         => $statusEnum->value,
                     'to'             => $transaction->to->id,
-                ],
+                ]
             ));
 
             ActivityCreated::dispatch($transaction->from->id, new ActivityResource($activityLog));

@@ -15,7 +15,7 @@ class ActivityCreated implements ShouldBroadcastNow
 
     public function __construct(
         public int $customerId,
-        public ActivityResource $activityResource
+        public ActivityResource $activity
     ) {}
 
     public function broadcastOn(): Channel
