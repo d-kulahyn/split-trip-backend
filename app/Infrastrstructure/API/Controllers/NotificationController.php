@@ -8,7 +8,7 @@ namespace App\Infrastrstructure\API\Controllers;
 use App\Domain\Entity\Customer;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Infrastrstructure\Notification\EmailNotification;
-use App\Infrastrstructure\Notification\PushNotifications;
+use App\Infrastrstructure\Notification\PushNotification;
 use App\Models\ExpenseDebt;
 use Illuminate\Http\JsonResponse;
 use App\Infrastrstructure\Notification\Messages\RemindDebtMessage;
@@ -31,7 +31,7 @@ readonly class NotificationController
     {
         $channels = [
             app(EmailNotification::class),
-            app(PushNotifications::class),
+            app(PushNotification::class),
         ];
 
         /** @var Customer $customer */

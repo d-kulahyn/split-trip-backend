@@ -10,7 +10,7 @@ use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory;
 
-class PushNotifications implements NotificationChannelInterface
+class PushNotification implements NotificationChannelInterface
 {
     /**
      * @param Factory $factory
