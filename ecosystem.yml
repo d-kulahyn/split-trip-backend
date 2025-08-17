@@ -1,0 +1,12 @@
+apps:
+  - script: 'artisan'
+    name: 'queue'
+    exec_interpreter: 'php'
+    max_memory_restart: '256M'
+    args:
+      - 'queue:work'
+    instances: 1
+    exec_mode: fork_mode
+    watch: false
+    disable_logs: true
+
