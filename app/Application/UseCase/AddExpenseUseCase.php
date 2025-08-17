@@ -19,6 +19,7 @@ use App\Infrastrstructure\API\Resource\ActivityResource;
 use App\Infrastrstructure\Notification\Messages\ExpenseAddedMessage;
 use App\Infrastrstructure\Notification\PushNotification;
 use App\Jobs\NotificationJob;
+use App\Shared\Helper\CurrencyHelper;
 use Illuminate\Support\Facades\DB;
 use App\Infrastrstructure\API\DTO\ExpenseDTO;
 use App\Domain\Repository\GroupReadRepositoryInterface;
@@ -125,7 +126,7 @@ class AddExpenseUseCase
             foreach ($group->getMemberIds->reject(fn(int $id) => $id === $customerId)->toArray() as $memberId) {
                 ActivityCreated::dispatch($memberId, new ActivityResource($activityLog));
                 NotificationJob::dispatch($this->notificationChannels, new ExpenseAddedMessage([
-                    'amount'        => $expense->credits(),
+                    'amount'        => CurrencyHelper::currency_symbol($expense->credits(), $group->finalCurrency),
                     'customer_name' => $whoAdded->name,
                     'date'          => $expense->createdAt,
                     'group_name'    => $group->name,
