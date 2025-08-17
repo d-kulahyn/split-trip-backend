@@ -105,7 +105,9 @@ readonly class AddExpenseUseCase
                 groupName : $group->name,
                 actionType: ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
                 customer  : $this->customerReadRepository->findById([$customerId])->first(),
-                details   : ['amount' => $expense->paid($customerId)]
+                details   : [
+                    'amount' => $expense->credits()
+                ]
             ));
 
             foreach ($group->getMemberIds->reject(fn(int $id) => $id === $customerId)->toArray() as $memberId) {

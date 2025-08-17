@@ -242,7 +242,7 @@ class Group
      *
      * @return Balance
      */
-    public function getMyGeneralStatistic(int $customerId): Balance
+    public function getGroupBalance(int $customerId): Balance
     {
         $balance = new Balance();
 
@@ -358,7 +358,5 @@ class Group
     public function __get(string $name)
     {
         return collect($this->$name());
-
-//        throw new \LogicException("Undefined property: " . static::class . "::$name");
     }
 }
