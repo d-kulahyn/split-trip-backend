@@ -30,8 +30,8 @@ class ExpenseAddedMessage extends ArrayObject implements FirebaseCloudMessagingI
     {
         return CloudMessage::new()
             ->withNotification([
-                'title' => 'New Expense',
-                'body'  => "User {$this->customer_name} created expense in group {$this->group_name} on {$this->date} with amount {$this->amount}",
+                'title' => '🆕 New Expense',
+                'body'  => "👤 {$this->customer_name} created expense in group {$this->group_name} with amount 💵{$this->amount}",
             ])
             ->toToken($this->token);
     }
