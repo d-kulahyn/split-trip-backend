@@ -18,6 +18,6 @@ class CurrencyHelper
             return null;
         }
 
-        return $s;
+        return str_replace(' ', '', $s);
     }
 }
