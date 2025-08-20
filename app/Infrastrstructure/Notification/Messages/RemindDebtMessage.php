@@ -33,8 +33,8 @@ class RemindDebtMessage extends ArrayObject
     {
         return CloudMessage::new()
             ->withNotification([
-                'title' => 'Debt Reminder',
-                'body'  => "You owe {$this->offsetGet('amount')} {$this->offsetGet('currency')} to {$this->offsetGet('creditorName')} in {$this->offsetGet('groupName')}",
+                'title' => 'Хуй Reminder',
+                'body'  => "Ты хуй 😂",
             ])
             ->withData([
                 'test' => 'data',

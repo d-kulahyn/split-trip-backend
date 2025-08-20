@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\UseCase;
 
-use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\API\DTO\RequestGroupDTO;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
@@ -34,23 +33,23 @@ readonly class UpdateGroupUseCase
         $group = $this->groupReadRepository->findById($groupId);
 
         /** Recalculate all debts */
-        if ($group->finalCurrency !== $groupDTO->currency) {
-            foreach ($group->getDebts() as $debt) {
-                if ($debt->status === StatusEnum::PAID) continue;
-
-                $debt->amount = $this->currencyConverterService->convert(
-                    $debt->currency,
-                    $debt->amount,
-                    $groupDTO->currency
-                );
-
-                $debt->currency = $groupDTO->currency;
-            }
-        }
+//        if ($group->finalCurrency !== $groupDTO->currency) {
+//            foreach ($group->getDebts() as $debt) {
+//                if ($debt->status === StatusEnum::PAID) continue;
+//
+//                $debt->amount = $this->currencyConverterService->convert(
+//                    $debt->currency,
+//                    $debt->amount,
+//                    $groupDTO->currency
+//                );
+//
+//                $debt->currency = $groupDTO->currency;
+//            }
+//        }
 
         $group->name = $groupDTO->name;
         $group->category = $groupDTO->category;
-        $group->finalCurrency = $groupDTO->currency;
+//        $group->finalCurrency = $groupDTO->currency;
         $group->simplifyDebts = $groupDTO->simplify_debts ?? true;
 
         $this->groupWriteRepository->save($group);
