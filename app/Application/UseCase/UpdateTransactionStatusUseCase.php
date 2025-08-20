@@ -24,7 +24,7 @@ readonly class UpdateTransactionStatusUseCase
         private ActivityWriteRepositoryInterface $activityLogRepository
     ) {}
 
-    public function execute(int $transactionId, StatusEnum $statusEnum): void
+    public function execute(int $transactionId, StatusEnum $statusEnum, int $authId): void
     {
         $transaction = $this->transactionReadRepository->getById($transactionId);
 
@@ -34,7 +34,7 @@ readonly class UpdateTransactionStatusUseCase
 
         $transaction->status = $statusEnum;
 
-        DB::transaction(function () use ($transaction, $statusEnum) {
+        DB::transaction(function () use ($transaction, $statusEnum, $authId) {
             $this->transactionWriteRepository->save($transaction);
 
             $activityLog = $this->activityLogRepository->save(new ActivityLog(
@@ -43,6 +43,7 @@ readonly class UpdateTransactionStatusUseCase
                 groupName : $transaction->groupName,
                 actionType: ActivityLogActionTypeEnum::TRANSACTION_UPDATED,
                 customer  : $transaction->to,
+                status    : $transaction->to->id === $authId ? StatusEnum::READ : StatusEnum::PENDING,
                 details   : [
                     'transaction_id' => $transaction->id,
                     'status'         => $statusEnum->value,

@@ -11,6 +11,7 @@ use App\Domain\Entity\Payer;
 use App\Domain\Entity\Debtor;
 use App\Domain\Entity\Expense;
 use App\Domain\Enum\ActivityLogActionTypeEnum;
+use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 use App\Domain\Repository\BalanceWriteRepositoryInterface;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
@@ -118,6 +119,7 @@ class AddExpenseUseCase
                 groupName : $group->name,
                 actionType: ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
                 customer  : $whoAdded,
+                status    : StatusEnum::READ,
                 details   : [
                     'amount' => $expense->credits(),
                 ]

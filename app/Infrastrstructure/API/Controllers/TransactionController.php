@@ -30,7 +30,7 @@ readonly class TransactionController
 
     public function status(Transaction $transaction, UpdateTransactionStatusDTO $updateTransactionStatusDTO): GroupResource
     {
-        $this->updateTransactionStatusUseCase->execute($transaction->id, $updateTransactionStatusDTO->status);
+        $this->updateTransactionStatusUseCase->execute($transaction->id, $updateTransactionStatusDTO->status, auth()->id());
 
         return new GroupResource($this->groupReadRepository->findById($transaction->group_id));
     }
