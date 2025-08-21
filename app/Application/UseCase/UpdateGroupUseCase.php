@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Application\UseCase;
 
 use App\Domain\Repository\GroupReadRepositoryInterface;
-use App\Infrastrstructure\API\DTO\RequestGroupDTO;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
+use App\Infrastrstructure\API\DTO\UpdateRequestGroupDTO;
 use App\Infrastrstructure\Service\CurrencyConverterService;
 
 readonly class UpdateGroupUseCase
@@ -24,11 +24,11 @@ readonly class UpdateGroupUseCase
 
     /**
      * @param string $groupId
-     * @param RequestGroupDTO $groupDTO
+     * @param UpdateRequestGroupDTO $groupDTO
      *
      * @return void
      */
-    public function execute(string $groupId, RequestGroupDTO $groupDTO): void
+    public function execute(string $groupId, UpdateRequestGroupDTO $groupDTO): void
     {
         $group = $this->groupReadRepository->findById($groupId);
 

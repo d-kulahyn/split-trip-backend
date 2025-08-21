@@ -6,18 +6,16 @@ namespace App\Infrastrstructure\API\DTO;
 
 use Spatie\LaravelData\Data;
 
-class RequestGroupDTO extends Data
+class UpdateRequestGroupDTO extends Data
 {
     /**
      * @param string $name
      * @param string $category
-     * @param string $currency
      * @param int|null $created_by
      */
     public function __construct(
         public string $name,
         public string $category,
-        public string $currency = 'USD',
         public ?int $created_by = null,
     ) {}
 
@@ -31,7 +29,6 @@ class RequestGroupDTO extends Data
         return [
             'name'     => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
-            'currency' => ['required', 'string', 'max:3'],
         ];
     }
 }

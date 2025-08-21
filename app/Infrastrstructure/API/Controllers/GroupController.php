@@ -17,6 +17,7 @@ use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
 use App\Infrastrstructure\API\DTO\ExpenseDTO;
 use App\Infrastrstructure\API\DTO\RequestGroupDTO;
+use App\Infrastrstructure\API\DTO\UpdateRequestGroupDTO;
 use App\Infrastrstructure\API\Exceptions\UnauthorizedGroupActionException;
 use App\Infrastrstructure\API\Exceptions\UserAlreadyInGroupException;
 use App\Infrastrstructure\API\Resource\CustomerResource;
@@ -86,11 +87,11 @@ readonly class GroupController
 
     /**
      * @param Group $group
-     * @param RequestGroupDTO $groupDTO
+     * @param UpdateRequestGroupDTO $groupDTO
      *
      * @return JsonResponse
      */
-    public function updateGroup(Group $group, RequestGroupDTO $groupDTO): JsonResponse
+    public function updateGroup(Group $group, UpdateRequestGroupDTO $groupDTO): JsonResponse
     {
         $this->updateGroupUseCase->execute($group->id, $groupDTO);
 

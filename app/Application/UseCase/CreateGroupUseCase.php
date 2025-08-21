@@ -16,6 +16,7 @@ readonly class CreateGroupUseCase
 {
     /**
      * @param GroupFactory $groupFactory
+     * @param CustomerReadRepositoryInterface $customerReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
      */
     public function __construct(
