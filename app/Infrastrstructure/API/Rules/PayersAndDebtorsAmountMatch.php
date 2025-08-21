@@ -21,6 +21,9 @@ class PayersAndDebtorsAmountMatch implements ValidationRule
     {
         $payerTotal = collect($this->payers)->sum('amount');
         $debtorTotal = collect($this->debtors)->sum('amount');
+        
+        header('Content-Type: application/json');
+        echo json_encode([$payerTotal, $debtorTotal]);die;
 
         if ($payerTotal !== $debtorTotal) {
             $fail('The total amount of payers and debtors must match.');
