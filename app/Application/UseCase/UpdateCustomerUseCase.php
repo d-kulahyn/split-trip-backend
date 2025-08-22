@@ -31,6 +31,7 @@ readonly class UpdateCustomerUseCase
         $customer = $this->customerReadRepository->findById([$id])->first();
 
         $customer->name = $updateCustomerDTO->name;
+        $customer->currency = $updateCustomerDTO->currency;
         $customer->email_notifications = $updateCustomerDTO->email_notifications;
         $customer->push_notifications = $updateCustomerDTO->push_notifications;
         $customer->debt_reminder_period = DebtReminderPeriodEnum::tryFrom($updateCustomerDTO->debt_reminder_period);
