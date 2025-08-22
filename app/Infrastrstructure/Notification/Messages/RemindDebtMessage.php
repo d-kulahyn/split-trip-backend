@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace App\Infrastrstructure\Notification\Messages;
 
-use ArrayObject;
 use Illuminate\Contracts\Mail\Mailable;
 use App\Application\Mail\RemindDebtEmail;
 use Kreait\Firebase\Messaging\CloudMessage;
 
-class RemindDebtMessage extends ArrayObject
-    implements FirebaseCloudMessagingInterface,
-               EmailMessageInterface
+/**
+ * Class RemindDebtMessage
+ *
+ * @@property-read float $amount
+ * @@property-read string $currency
+ * @@property-read string $groupName
+ * @@property-read string $creditorName
+ * @@property-read string|null $token
+ */
+class RemindDebtMessage extends BaseMessage implements FirebaseCloudMessagingInterface, EmailMessageInterface
 {
     /**
      * @return Mailable
@@ -19,10 +25,10 @@ class RemindDebtMessage extends ArrayObject
     public function email(): Mailable
     {
         return new RemindDebtEmail(
-            $this->offsetGet('amount'),
-            $this->offsetGet('currency'),
-            $this->offsetGet('groupName'),
-            $this->offsetGet('creditorName')
+            $this->amount,
+            $this->currency,
+            $this->groupName,
+            $this->creditorName
         );
     }
 
@@ -33,9 +39,9 @@ class RemindDebtMessage extends ArrayObject
     {
         return CloudMessage::new()
             ->withNotification([
-                'title' => 'Debt Reminder',
-                'body'  => "You owe {$this->offsetGet('amount')} {$this->offsetGet('currency')} to {$this->offsetGet('creditorName')} in {$this->offsetGet('groupName')}",
+                'title' => '👺 Debt Reminder',
+                'body'  => "You owe 💵 {$this->amount} {$this->currency} to 👤 {$this->creditorName} in {$this->groupName}",
             ])
-            ->toToken($this->offsetGet('token'));
+            ->toToken($this->token);
     }
 }

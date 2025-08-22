@@ -6,8 +6,6 @@ namespace App\Infrastrstructure\Notification;
 
 use App\Domain\Notification\NotificationChannelInterface;
 use App\Infrastrstructure\Notification\Messages\FirebaseCloudMessagingInterface;
-use Kreait\Firebase\Exception\FirebaseException;
-use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory;
 
 class PushNotification implements NotificationChannelInterface
@@ -20,17 +18,19 @@ class PushNotification implements NotificationChannelInterface
     ) {}
 
     /**
-     * @throws MessagingException
-     * @throws FirebaseException
      */
     public function send(\ArrayObject $message): void
     {
-        if (!is_subclass_of($message, FirebaseCloudMessagingInterface::class)) return;
+        try {
+            if (!is_subclass_of($message, FirebaseCloudMessagingInterface::class)) return;
 
-        if (!$message->offsetGet('token')) return;
+            if (!$message->offsetGet('token')) return;
 
-        $messaging = $this->factory->createMessaging();
+            $messaging = $this->factory->createMessaging();
 
-        $messaging->send($message->fcm());
+            $messaging->send($message->fcm());
+        } catch (\Throwable $exception) {
+            //TODO: Add logger
+        }
     }
 }

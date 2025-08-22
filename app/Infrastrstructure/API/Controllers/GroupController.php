@@ -81,8 +81,10 @@ readonly class GroupController
 
         $group = $this->createGroupUseCase->execute($groupDTO);
 
-        return response(new GroupResource($this->groupReadRepository->findById($group->id)),
-            ResponseAlias::HTTP_CREATED);
+        return response(
+            new GroupResource($this->groupReadRepository->findById($group->id)),
+            ResponseAlias::HTTP_CREATED
+        );
     }
 
     /**
