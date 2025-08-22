@@ -2,6 +2,7 @@
 
 namespace App\Infrastrstructure\API\Controllers;
 
+use App\Application\UseCase\CustomerAuthMeUseCase;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\Repository\CustomerWriteRepositoryInterface;
 use Illuminate\Http\JsonResponse;
@@ -23,13 +24,15 @@ readonly class ProfileController
      * @param UpdateCustomerPasswordUseCase $updateCustomerPasswordUseCase
      * @param CustomerReadRepositoryInterface $customerReadRepository
      * @param CustomerWriteRepositoryInterface $customerWriteRepository
+     * @param CustomerAuthMeUseCase $customerAuthMeUseCase
      */
     public function __construct(
         private UpdateCustomerUseCase $updateCustomerUseCase,
         private UpdateCustomerEmailUseCase $updateCustomerEmailUseCase,
         private UpdateCustomerPasswordUseCase $updateCustomerPasswordUseCase,
         private CustomerReadRepositoryInterface $customerReadRepository,
-        private CustomerWriteRepositoryInterface $customerWriteRepository
+        private CustomerWriteRepositoryInterface $customerWriteRepository,
+        private CustomerAuthMeUseCase $customerAuthMeUseCase,
     ) {}
 
     /**
@@ -41,7 +44,7 @@ readonly class ProfileController
     {
         $this->updateCustomerUseCase->execute(request()->user()->id, $updateCustomerDTO);
 
-        return response()->json(['message' => 'Profile has been updated successfully.']);
+        return response()->json($this->customerAuthMeUseCase->execute(request()->user()->id));
     }
 
     /**
