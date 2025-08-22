@@ -28,6 +28,7 @@ class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepository
             'group_id'    => $activity->groupId,
             'action_type' => $activity->actionType->value,
             'details'     => $activity->details,
+            'status'      => $activity->status->value,
         ]);
 
         $eloquentActivityLog->save();
