@@ -6,15 +6,14 @@ namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\Customer;
 use App\Domain\Entity\Expense;
-use App\Events\GroupCreatedEvent;
-use App\Events\GroupUpdatedEvent;
+use App\Domain\Events\GroupCreatedEvent;
+use App\Domain\Events\GroupUpdatedEvent;
 use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
 use App\Models\Debtor;
 use App\Models\Payer;
 use Illuminate\Support\Facades\DB;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
-use Illuminate\Support\Facades\Log;
 
 class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
 {

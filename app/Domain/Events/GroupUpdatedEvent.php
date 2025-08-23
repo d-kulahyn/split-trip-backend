@@ -3,6 +3,7 @@
 namespace App\Domain\Events;
 
 use App\Domain\Repository\GroupReadRepositoryInterface;
+use App\Infrastrstructure\API\Resource\GroupResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -26,7 +27,7 @@ class GroupUpdatedEvent implements ShouldBroadcastNow
     {
         $repository = app(GroupReadRepositoryInterface::class);
 
-        return ['group' => $repository->findById($this->groupId)];
+        return ['group' => new GroupResource($repository->findById($this->groupId))];
     }
 
     public function broadcastAs(): string
