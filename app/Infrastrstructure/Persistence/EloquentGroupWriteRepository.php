@@ -6,6 +6,7 @@ namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\Customer;
 use App\Domain\Entity\Expense;
+use App\Events\GroupCreatedEvent;
 use App\Events\GroupUpdatedEvent;
 use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
@@ -126,7 +127,11 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
 
             if ($updated) {
                 GroupUpdatedEvent::dispatch($group->id);
+
+                return;
             }
+
+            GroupCreatedEvent::dispatch($group->id);
         });
     }
 

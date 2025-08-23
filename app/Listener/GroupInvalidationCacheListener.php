@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listener;
 
-use App\Events\GroupUpdatedEvent;
+use App\Events\GroupCreatedEvent;
 use Illuminate\Support\Facades\Cache;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 
@@ -14,11 +14,11 @@ readonly class GroupInvalidationCacheListener
         private GroupReadRepositoryInterface $groupReadRepository
     ) {}
 
-    public function handle(GroupUpdatedEvent $event): void
+    public function handle(GroupCreatedEvent $event): void
     {
         $group = $this->groupReadRepository->findById($event->groupId);
 
-        foreach ($event->group->getMemberIds() as $memberId) {
+        foreach ($group->getMemberIds() as $memberId) {
             Cache::forget("groups:{$memberId}");
         }
     }
