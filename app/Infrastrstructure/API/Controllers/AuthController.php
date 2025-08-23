@@ -88,18 +88,18 @@ readonly class AuthController
         return response()->json([
             'access_token' => $token,
             'user'         => $this->customerAuthMeUseCase->execute(request()->user()->id),
-            'groups'       => GroupResource::collection($this->groupReadRepository->list(auth()->id())),
+            'groups'       => GroupResource::collection($this->groupReadRepository->list(auth()->id()))->toArray(request()),
             'transactions' => TransactionResource::collection($this->transactionReadRepository->list(
                 StatusEnum::PENDING,
-                auth()->id()
-            )),
+                auth()->id())
+            )->toArray(request()),
             'activities'   => ActivityResource::collection(
                 $this->activityReadRepository->list(
                     StatusEnum::PENDING,
                     auth()->id(),
                     ['group', 'customer']
                 )
-            ),
+            )->toArray(request()),
         ]);
     }
 
