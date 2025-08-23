@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Listener;
+namespace App\Application\Listener;
 
-use App\Events\GroupCreatedEvent;
+use App\Domain\Events\GroupCreatedEvent;
 use Illuminate\Support\Facades\Cache;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 

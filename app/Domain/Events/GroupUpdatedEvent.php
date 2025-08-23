@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Domain\Events;
 
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use Illuminate\Broadcasting\Channel;

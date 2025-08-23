@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withEvents(discover: [
-        __DIR__.'/../app/Domain/Listener'
+        __DIR__.'/../app/Application/Listener'
     ])
     ->withExceptions(function (Exceptions $exceptions) {
         //

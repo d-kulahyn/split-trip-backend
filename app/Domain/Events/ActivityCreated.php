@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Events;
+namespace App\Domain\Events;
 
-use App\Infrastrstructure\API\Resource\TransactionResource;
+use App\Infrastrstructure\API\Resource\ActivityResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TransactionCreated implements ShouldBroadcastNow
+class ActivityCreated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public TransactionResource $transaction,
-        public string $groupId
+        public int $customerId,
+        public ActivityResource $activity
     ) {}
 
     public function broadcastOn(): Channel
     {
-        return new Channel("group:{$this->groupId}");
+        return new Channel("activity:{$this->customerId}");
     }
 
     public function broadcastAs(): string
     {
-        return 'transactionCreated';
+        return 'activityCreated';
     }
 
     /**
