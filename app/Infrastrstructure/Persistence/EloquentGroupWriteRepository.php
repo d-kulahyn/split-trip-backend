@@ -25,112 +25,107 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
     public function save(Group $group): void
     {
         DB::transaction(function () use ($group) {
-            try {
-                $updated = $group->id === null;
+            $updated = $group->id !== null;
 
-                $eloquentGroup = \App\Models\Group::updateOrCreate(
-                    ['id' => $group->id],
+            $eloquentGroup = \App\Models\Group::updateOrCreate(
+                ['id' => $group->id],
+                [
+                    'name'           => $group->name,
+                    'category'       => $group->category,
+                    'created_by'     => $group->createdBy,
+                    'final_currency' => $group->finalCurrency,
+                    'avatar'         => $group->avatar,
+                ]
+            );
+
+            $group->id = (string)$eloquentGroup->id;
+            $eloquentGroup->members()->sync(array_values(array_map(
+                fn(Customer $customer) => $customer->id,
+                $group->getMembers()
+            )));
+
+            $idsToDelete = array_map(
+                fn (Expense $expense) => $expense->id,
+                $group->getExpensesToDelete()
+            );
+
+            if (!empty($idsToDelete)) {
+                \App\Models\Expense::query()->whereIn('id', $idsToDelete)->delete();
+            }
+
+            foreach ($group->getExpenses() as $expense) {
+                $eloquentExpense = $eloquentGroup->expenses()->updateOrCreate(
+                    ['id' => $expense->id],
                     [
-                        'name'           => $group->name,
-                        'category'       => $group->category,
-                        'created_by'     => $group->createdBy,
-                        'final_currency' => $group->finalCurrency,
-                        'avatar'         => $group->avatar,
+                        'description'    => $expense->description,
+                        'category'       => $expense->category,
+                        'final_currency' => $expense->currency,
+                        'created_at'     => $expense->createdAt,
                     ]
                 );
 
-                $group->id = (string)$eloquentGroup->id;
-                $eloquentGroup->members()->sync(array_values(array_map(
-                    fn(Customer $customer) => $customer->id,
-                    $group->getMembers()
-                )));
+                $expense->id = $eloquentExpense->id;
 
-                $idsToDelete = array_map(
-                    fn (Expense $expense) => $expense->id,
-                    $group->getExpensesToDelete()
-                );
-
-                if (!empty($idsToDelete)) {
-                    \App\Models\Expense::query()->whereIn('id', $idsToDelete)->delete();
-                }
-
-                foreach ($group->getExpenses() as $expense) {
-                    $eloquentExpense = $eloquentGroup->expenses()->updateOrCreate(
-                        ['id' => $expense->id],
+                foreach ($expense->getDebts() as $debt) {
+                    $eloquentDebt = ExpenseDebt::query()->updateOrCreate(
+                        ['id' => $debt->id],
                         [
-                            'description'    => $expense->description,
-                            'category'       => $expense->category,
-                            'final_currency' => $expense->currency,
-                            'created_at'     => $expense->createdAt,
+                            'amount'     => $debt->amount,
+                            'currency'   => $debt->currency,
+                            'from'       => $debt->from->id,
+                            'to'         => $debt->to->id,
+                            'expense_id' => $eloquentExpense->id,
+                            'group_id'   => $eloquentGroup->id,
                         ]
                     );
-
-                    $expense->id = $eloquentExpense->id;
-
-                    foreach ($expense->getDebts() as $debt) {
-                        $eloquentDebt = ExpenseDebt::query()->updateOrCreate(
-                            ['id' => $debt->id],
-                            [
-                                'amount'     => $debt->amount,
-                                'currency'   => $debt->currency,
-                                'from'       => $debt->from->id,
-                                'to'         => $debt->to->id,
-                                'expense_id' => $eloquentExpense->id,
-                                'group_id'   => $eloquentGroup->id,
-                            ]
-                        );
-                        $debt->id = $eloquentDebt->id;
-                    }
-
-                    foreach ($expense->getPayers() as $payer) {
-                        Payer::query()->updateOrCreate(
-                            ['id' => $payer->id],
-                            [
-
-                                'expense_id' => $eloquentExpense->id,
-                                'amount'     => $payer->amount,
-                                'currency'   => $payer->currency,
-                                'payer_id'   => $payer->payerId,
-                            ]
-                        );
-                    }
-
-                    foreach ($expense->getDebtors() as $debtor) {
-                        Debtor::query()->updateOrCreate(
-                            ['id' => $debtor->id],
-                            [
-                                'expense_id' => $eloquentExpense->id,
-                                'amount'     => $debtor->amount,
-                                'debtor_id'  => $debtor->debtorId,
-                                'currency'   => $debtor->currency,
-                            ]
-                        );
-                    }
+                    $debt->id = $eloquentDebt->id;
                 }
 
-                if ($group->simplifyDebts) {
-                    $distributedDebts = $group->distributeDebts();
-                    $eloquentGroup->debts()->delete();
+                foreach ($expense->getPayers() as $payer) {
+                    Payer::query()->updateOrCreate(
+                        ['id' => $payer->id],
+                        [
 
-                    $insert = [];
-                    foreach ($distributedDebts as $debt) {
-                        $insert[] = [
-                            'amount'   => $debt->amount,
-                            'currency' => $debt->currency,
-                            'from'     => $debt->from->id,
-                            'to'       => $debt->to->id,
-                            'group_id' => $group->id,
-                        ];
-                    }
-                    ExpenseDebt::query()->insert($insert);
+                            'expense_id' => $eloquentExpense->id,
+                            'amount'     => $payer->amount,
+                            'currency'   => $payer->currency,
+                            'payer_id'   => $payer->payerId,
+                        ]
+                    );
                 }
 
-                if ($updated) {
-                    GroupUpdatedEvent::dispatch($group->id);
+                foreach ($expense->getDebtors() as $debtor) {
+                    Debtor::query()->updateOrCreate(
+                        ['id' => $debtor->id],
+                        [
+                            'expense_id' => $eloquentExpense->id,
+                            'amount'     => $debtor->amount,
+                            'debtor_id'  => $debtor->debtorId,
+                            'currency'   => $debtor->currency,
+                        ]
+                    );
                 }
-            } catch (\Throwable $throwable) {
-                Log::error($throwable->getMessage());
-                throw $throwable;
+            }
+
+            if ($group->simplifyDebts) {
+                $distributedDebts = $group->distributeDebts();
+                $eloquentGroup->debts()->delete();
+
+                $insert = [];
+                foreach ($distributedDebts as $debt) {
+                    $insert[] = [
+                        'amount'   => $debt->amount,
+                        'currency' => $debt->currency,
+                        'from'     => $debt->from->id,
+                        'to'       => $debt->to->id,
+                        'group_id' => $group->id,
+                    ];
+                }
+                ExpenseDebt::query()->insert($insert);
+            }
+
+            if ($updated) {
+                GroupUpdatedEvent::dispatch($group->id);
             }
         });
     }
