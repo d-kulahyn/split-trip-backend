@@ -6,7 +6,6 @@ namespace App\Application\UseCase;
 
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
-use App\Events\GroupUpdatedEvent;
 
 readonly class ToggleSimplifyDebtsUseCase
 {

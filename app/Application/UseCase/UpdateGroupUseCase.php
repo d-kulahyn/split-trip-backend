@@ -6,10 +6,8 @@ namespace App\Application\UseCase;
 
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
-use App\Events\GroupUpdatedEvent;
 use App\Infrastrstructure\API\DTO\UpdateRequestGroupDTO;
 use App\Infrastrstructure\Service\CurrencyConverterService;
-use Illuminate\Support\Facades\Cache;
 
 readonly class UpdateGroupUseCase
 {

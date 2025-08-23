@@ -21,12 +21,12 @@ class GroupUpdatedEvent
         return new Channel("group:{$this->groupId}");
     }
 
-    public function broadcastWith(): array
-    {
-        $repository = app(GroupReadRepositoryInterface::class);
-
-        return ['group' => $repository->findById($this->groupId)];
-    }
+//    public function broadcastWith(): array
+//    {
+//        $repository = app(GroupReadRepositoryInterface::class);
+//
+//        return ['group' => $repository->findById($this->groupId)];
+//    }
 
     public function broadcastAs(): string
     {
