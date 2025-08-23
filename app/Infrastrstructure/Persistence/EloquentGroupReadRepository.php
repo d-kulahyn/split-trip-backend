@@ -67,25 +67,27 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
      */
     public function list(int $customerId): array
     {
-        $paginator = Group::query()
-            ->with([
-                'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
-                'members',
-                'debts'
-            ])
-            ->where(function ($query) use ($customerId) {
-                $query->where('created_by', $customerId)
-                    ->orWhereHas('members', function ($query) use ($customerId) {
-                        $query->where('customer_id', $customerId);
-                    });
-            })
-            ->orderBy('created_at', 'desc')
-            ->simplePaginate();
+        return Cache::rememberForever('groups:' . $customerId, function () use ($customerId) {
+            $paginator = Group::query()
+                ->with([
+                    'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
+                    'members',
+                    'debts'
+                ])
+                ->where(function ($query) use ($customerId) {
+                    $query->where('created_by', $customerId)
+                        ->orWhereHas('members', function ($query) use ($customerId) {
+                            $query->where('customer_id', $customerId);
+                        });
+                })
+                ->orderBy('created_at', 'desc')
+                ->simplePaginate();
 
 
-        return array_map(function ($group) {
-            return GroupEloquentToDomainEntity::toEntity($group);
-        }, $paginator->items());
+            return array_map(function ($group) {
+                return GroupEloquentToDomainEntity::toEntity($group);
+            }, $paginator->items());
+        } );
     }
 
     /**
