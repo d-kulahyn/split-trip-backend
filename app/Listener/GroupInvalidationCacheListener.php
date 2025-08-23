@@ -18,7 +18,7 @@ readonly class GroupInvalidationCacheListener
     {
         $group = $this->groupReadRepository->findById($event->groupId);
 
-        foreach ($group->getMemberIds() as $memberId) {
+        foreach ($event->group->getMemberIds() as $memberId) {
             Cache::forget("groups:{$memberId}");
         }
     }
