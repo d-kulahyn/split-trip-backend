@@ -10,12 +10,19 @@ use App\Application\UseCase\LogoutUserUseCase;
 use App\Application\UseCase\ResetPasswordUseCase;
 use App\Application\UseCase\SendConfirmationCodeToCustomerUseCase;
 use App\Application\UseCase\SocialAuthUseCase;
+use App\Domain\Enum\StatusEnum;
+use App\Domain\Repository\ActivityReadRepositoryInterface;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
+use App\Domain\Repository\GroupReadRepositoryInterface;
+use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Infrastrstructure\API\DTO\ConfirmEmailDTO;
 use App\Infrastrstructure\API\DTO\CreateUserDTO;
 use App\Infrastrstructure\API\DTO\LoginDTO;
 use App\Infrastrstructure\API\DTO\ResetPasswordDTO;
 use App\Infrastrstructure\API\DTO\SocialAuthDTO;
+use App\Infrastrstructure\API\Resource\ActivityResource;
+use App\Infrastrstructure\API\Resource\GroupResource;
+use App\Infrastrstructure\API\Resource\TransactionResource;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
 use Random\RandomException;
@@ -32,6 +39,7 @@ readonly class AuthController
      * @param CustomerAuthMeUseCase $customerAuthMeUseCase
      * @param SendConfirmationCodeToCustomerUseCase $sendConfirmationCodeToCustomerUseCase
      * @param CustomerReadRepositoryInterface $customerReadRepository
+     * @param GroupReadRepositoryInterface $groupReadRepository
      */
     public function __construct(
         protected CreateUserUseCase $createUserUseCase,
@@ -42,7 +50,10 @@ readonly class AuthController
         protected SocialAuthUseCase $socialAuthUseCase,
         protected CustomerAuthMeUseCase $customerAuthMeUseCase,
         protected SendConfirmationCodeToCustomerUseCase $sendConfirmationCodeToCustomerUseCase,
-        protected CustomerReadRepositoryInterface $customerReadRepository
+        protected CustomerReadRepositoryInterface $customerReadRepository,
+        protected GroupReadRepositoryInterface $groupReadRepository,
+        protected TransactionReadRepositoryInterface $transactionReadRepository,
+        protected ActivityReadRepositoryInterface $activityReadRepository,
     ) {}
 
     /**
@@ -56,7 +67,10 @@ readonly class AuthController
 
         $customer = $this->customerReadRepository->findByEmail($createUserDTO->email);
 
-        return response()->json(['access_token' => $token, 'user' => $this->customerAuthMeUseCase->execute($customer->id)], ResponseAlias::HTTP_CREATED);
+        return response()->json([
+            'access_token' => $token,
+            'user'         => $this->customerAuthMeUseCase->execute($customer->id),
+        ], ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -71,7 +85,22 @@ readonly class AuthController
             return response()->json(['message' => 'Bad login or password.'], ResponseAlias::HTTP_BAD_REQUEST);
         }
 
-        return response()->json(['access_token' => $token, 'user' => $this->customerAuthMeUseCase->execute(request()->user()->id)]);
+        return response()->json([
+            'access_token' => $token,
+            'user'         => $this->customerAuthMeUseCase->execute(request()->user()->id),
+            'groups'       => GroupResource::collection($this->groupReadRepository->list(auth()->id())),
+            'transactions' => TransactionResource::collection($this->transactionReadRepository->list(
+                StatusEnum::PENDING,
+                auth()->id()
+            )),
+            'activities'   => ActivityResource::collection(
+                $this->activityReadRepository->list(
+                    StatusEnum::PENDING,
+                    auth()->id(),
+                    ['group', 'customer']
+                )
+            ),
+        ]);
     }
 
     /**

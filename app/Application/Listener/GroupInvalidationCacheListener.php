@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Listener;
 
 use App\Domain\Events\GroupCreatedEvent;
+use App\Domain\Events\GroupDeletedEvent;
 use Illuminate\Support\Facades\Cache;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 
@@ -14,7 +15,7 @@ readonly class GroupInvalidationCacheListener
         private GroupReadRepositoryInterface $groupReadRepository
     ) {}
 
-    public function handle(GroupCreatedEvent $event): void
+    public function handle(GroupCreatedEvent|GroupDeletedEvent $event): void
     {
         $group = $this->groupReadRepository->findById($event->groupId);
 

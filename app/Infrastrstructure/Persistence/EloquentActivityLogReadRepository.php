@@ -8,33 +8,35 @@ use App\Domain\Entity\ActivityLog;
 use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\ActivityReadRepositoryInterface;
 use App\Infrastrstructure\Mapper\CustomerEloquentToDomainEntity;
-use App\Infrastrstructure\Persistence\Mappers\EloquentGroupMapper;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class EloquentActivityLogReadRepository implements ActivityReadRepositoryInterface
 {
 
     public function list(StatusEnum $status, int $to, array $with = []): Collection
     {
-        return \App\Models\ActivityLog::query()
-            ->where('status', $status->value)
-            ->where('customer_id', $to)
-            ->with($with)
-            ->get()
-            ->map(function (\App\Models\ActivityLog $activityLog) {
-                return new ActivityLog(
-                    customerId: $activityLog->customer_id,
-                    groupId   : $activityLog->group_id,
-                    groupName : $activityLog->group->name,
-                    actionType: $activityLog->action_type,
-                    customer  : $activityLog->relationLoaded('customer')
-                        ? CustomerEloquentToDomainEntity::toEntity($activityLog->customer)
-                        : null,
-                    createdAt : $activityLog->created_at ? $activityLog->created_at->getTimestamp() : null,
-                    status    : $activityLog->status,
-                    details   : $activityLog->details,
-                    id        : $activityLog->id
-                );
-            });
+        return Cache::remember("activity:{$to}", 3600, function () use ($status, $to, $with) {
+            return \App\Models\ActivityLog::query()
+                ->where('status', $status->value)
+                ->where('customer_id', $to)
+                ->with($with)
+                ->get()
+                ->map(function (\App\Models\ActivityLog $activityLog) {
+                    return new ActivityLog(
+                        customerId: $activityLog->customer_id,
+                        groupId   : $activityLog->group_id,
+                        groupName : $activityLog->group->name,
+                        actionType: $activityLog->action_type,
+                        customer  : $activityLog->relationLoaded('customer')
+                            ? CustomerEloquentToDomainEntity::toEntity($activityLog->customer)
+                            : null,
+                        createdAt : $activityLog->created_at ? $activityLog->created_at->getTimestamp() : null,
+                        status    : $activityLog->status,
+                        details   : $activityLog->details,
+                        id        : $activityLog->id
+                    );
+                });
+        });
     }
 }
