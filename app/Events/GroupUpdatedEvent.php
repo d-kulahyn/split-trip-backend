@@ -13,7 +13,7 @@ class GroupUpdatedEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public readonly string $groupId,
+        public string $groupId,
     ) {}
 
     public function broadcastOn(): Channel
@@ -21,12 +21,12 @@ class GroupUpdatedEvent
         return new Channel("group:{$this->groupId}");
     }
 
-//    public function broadcastWith(): array
-//    {
-//        $repository = app(GroupReadRepositoryInterface::class);
-//
-//        return ['group' => $repository->findById($this->groupId)];
-//    }
+    public function broadcastWith(): array
+    {
+        $repository = app(GroupReadRepositoryInterface::class);
+
+        return ['group' => $repository->findById($this->groupId)];
+    }
 
     public function broadcastAs(): string
     {
