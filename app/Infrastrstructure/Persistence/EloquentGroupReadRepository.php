@@ -67,7 +67,7 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
      */
     public function list(int $customerId): array
     {
-        return Cache::rememberForever('groups:' . $customerId, function () use ($customerId) {
+        return Cache::remember("groups:{$customerId}", 3600, function () use ($customerId) {
             $paginator = Group::query()
                 ->with([
                     'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
