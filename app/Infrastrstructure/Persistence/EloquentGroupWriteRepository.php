@@ -6,6 +6,7 @@ namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\Customer;
 use App\Domain\Entity\Expense;
+use App\Events\GroupUpdatedEvent;
 use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
 use App\Models\Debtor;
@@ -23,6 +24,8 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
     public function save(Group $group): void
     {
         DB::transaction(function () use ($group) {
+            $updated = $group->id === null;
+
             $eloquentGroup = \App\Models\Group::updateOrCreate(
                 ['id' => $group->id],
                 [
@@ -118,6 +121,10 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                     ];
                 }
                 ExpenseDebt::query()->insert($insert);
+            }
+
+            if ($updated) {
+                GroupUpdatedEvent::dispatch($group->id);
             }
         });
     }
