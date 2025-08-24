@@ -24,7 +24,7 @@ class GroupResource extends JsonResource
         $balances = $resource->getBalances();
         
         header('Content-Type: application/json');
-        echo json_encode($balances);die;
+        echo json_encode([$balances, $resource->getMemberIds()]);die;
         
         $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance())->toArray();
 
