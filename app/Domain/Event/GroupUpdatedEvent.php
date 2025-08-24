@@ -2,7 +2,7 @@
 
 namespace App\Domain\Event;
 
-use App\Domain\Entity\Group;
+use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\API\Resource\GroupResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -15,17 +15,19 @@ class GroupUpdatedEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public Group $group,
+        public string $groupId,
     ) {}
 
     public function broadcastOn(): Channel
     {
-        return new Channel("group:{$this->group->id}");
+        return new Channel("group:{$this->groupId}");
     }
 
     public function broadcastWith(): array
     {
-        return ['group' => new GroupResource($this->group)];
+        $groupRepository = app(GroupReadRepositoryInterface::class);
+
+        return ['group' => new GroupResource($groupRepository->getById($this->groupId))];
     }
 
     public function broadcastAs(): string

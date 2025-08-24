@@ -14,7 +14,6 @@ use App\Domain\Enum\ActivityLogActionTypeEnum;
 use App\Domain\Enum\StatusEnum;
 use App\Domain\Event\ActivityCreatedEvent;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
-use App\Domain\Repository\BalanceWriteRepositoryInterface;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Infrastrstructure\Notification\Messages\ExpenseAddedMessage;
 use App\Infrastrstructure\Notification\PushNotification;
@@ -38,7 +37,6 @@ class AddExpenseUseCase
      * @param GroupReadRepositoryInterface $groupReadRepository
      * @param GroupWriteRepositoryInterface $groupWriteRepository
      * @param CurrencyConverterService $currencyConverterService
-     * @param BalanceWriteRepositoryInterface $balanceWriteRepository
      * @param ActivityWriteRepositoryInterface $activityWriteRepository
      * @param CustomerReadRepositoryInterface $customerReadRepository
      */
@@ -46,7 +44,6 @@ class AddExpenseUseCase
         private readonly GroupReadRepositoryInterface $groupReadRepository,
         private readonly GroupWriteRepositoryInterface $groupWriteRepository,
         private readonly CurrencyConverterService $currencyConverterService,
-        private readonly BalanceWriteRepositoryInterface $balanceWriteRepository,
         private readonly ActivityWriteRepositoryInterface $activityWriteRepository,
         private readonly CustomerReadRepositoryInterface $customerReadRepository,
     ) {}
@@ -102,11 +99,6 @@ class AddExpenseUseCase
             $this
                 ->groupWriteRepository
                 ->save($group);
-
-            $this->balanceWriteRepository->update(
-                $group->getBalances(),
-                $group->getMember($customerId),
-            );
 
             /** @var Customer $whoAdded */
             $whoAdded = $this->customerReadRepository->findById([$customerId])->first();

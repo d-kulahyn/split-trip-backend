@@ -124,7 +124,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                 ExpenseDebt::query()->insert($insert);
             }
 
-            GroupUpdatedEvent::dispatch($group);
+            GroupUpdatedEvent::dispatch($group->id);
         });
     }
 

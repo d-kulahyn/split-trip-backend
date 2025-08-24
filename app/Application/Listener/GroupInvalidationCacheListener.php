@@ -6,15 +6,22 @@ namespace App\Application\Listener;
 
 use App\Domain\Event\GroupDeletedEvent;
 use App\Domain\Event\GroupUpdatedEvent;
+use App\Domain\Repository\GroupReadRepositoryInterface;
 use Illuminate\Support\Facades\Cache;
 
 readonly class GroupInvalidationCacheListener
 {
+    public function __construct(
+        public readonly GroupReadRepositoryInterface $groupReadRepository,
+    ) {}
+
     public function handle(GroupUpdatedEvent|GroupDeletedEvent $event): void
     {
-        Cache::forget("group:{$event->group->id}:balances");
+        $group = $this->groupReadRepository->findById($event->groupId);
 
-        foreach ($event->group->getMemberIds() as $customerId) {
+        Cache::forget("group:{$group->id}:balances");
+
+        foreach ($group->getMemberIds() as $customerId) {
             Cache::forget("customer:{$customerId}:groups");
             Cache::forget("customer:{$customerId}:balance");
         }
