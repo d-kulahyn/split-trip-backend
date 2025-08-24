@@ -241,34 +241,6 @@ class Group
     }
 
     /**
-     * @param int $customerId
-     *
-     * @return Balance
-     */
-    public function getGroupBalance(int $customerId): Balance
-    {
-        $balance = new Balance();
-
-        foreach ($this->getExpenses() as $expense) {
-            foreach($expense->getPayers() as $payer) {
-                if ($payer->payerId === $customerId) {
-                    $balance->paid = (float)bcadd((string)$balance->paid, (string)$payer->amount);
-                }
-            }
-
-            foreach($expense->getDebtors() as $debtor) {
-                if ($debtor->debtorId === $customerId) {
-                    $balance->owe = (float)bcadd((string)$balance->owe, (string)$debtor->amount);
-                }
-            }
-        }
-
-        $balance->balance = (float)bcsub((string)$balance->paid, (string)$balance->owe);
-
-        return $balance;
-    }
-
-    /**
      * @return array<Debt>
      */
     public function getDebts(): array
