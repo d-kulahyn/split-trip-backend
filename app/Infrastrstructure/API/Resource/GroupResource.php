@@ -23,7 +23,7 @@ class GroupResource extends JsonResource
 
         $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance())->toArray();
 
-        if (!$resource->getBalanceOf(35)) {
+        if (!in_array(35, $resource->getMemberIds()) && !$resource->getBalanceOf(35)) {
             header('Content-Type: application/json');
             echo json_encode([
                 $resource->getMemberIds(),
