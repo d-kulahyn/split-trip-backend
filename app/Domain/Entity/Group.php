@@ -145,52 +145,50 @@ class Group
      */
     public function getBalances(array $memberIds = []): array
     {
-        $balances = [];
-        foreach ($this->getMemberIds() as $memberId) {
-            if (!empty($memberIds) && !in_array($memberId, $memberIds)) {
-                continue;
-            }
-
-            if (!isset($balances[$memberId])) {
-                $balances[$memberId] = new Balance(customerId: $memberId);
-            }
-
-            foreach ($this->getDebts() as $debt) {
-                if ($debt->status === StatusEnum::PAID) {
-
-                    continue;
-                }
-
-                if ($debt->from->id === $memberId) {
-                    $balances[$memberId]->balance = (float)bcsub(
-                        (string)$balances[$memberId]->balance,
-                        (string)$debt->amount
-                    );
-                    $balances[$memberId]->owe = (float)bcadd(
-                        (string)$balances[$memberId]->owe,
-                        (string)$debt->amount
-                    );
-
-                    continue;
-                }
-
-                if ($debt->to->id === $memberId) {
-                    $balances[$memberId]->balance = (float)bcadd(
-                        (string)$balances[$memberId]->balance,
-                        (string)$debt->amount
-                    );
-                    $balances[$memberId]->paid = (float)bcadd(
-                        (string)$balances[$memberId]->paid,
-                        (string)$debt->amount
-                    );
-                }
-            }
-        }
-
-        return $balances;
-
         return Cache::remember("group:{$this->id}:balances", 3600, function () use ($memberIds) {
+            $balances = [];
+            foreach ($this->getMemberIds() as $memberId) {
+                if (!empty($memberIds) && !in_array($memberId, $memberIds)) {
+                    continue;
+                }
 
+                if (!isset($balances[$memberId])) {
+                    $balances[$memberId] = new Balance(customerId: $memberId);
+                }
+
+                foreach ($this->getDebts() as $debt) {
+                    if ($debt->status === StatusEnum::PAID) {
+
+                        continue;
+                    }
+
+                    if ($debt->from->id === $memberId) {
+                        $balances[$memberId]->balance = (float)bcsub(
+                            (string)$balances[$memberId]->balance,
+                            (string)$debt->amount
+                        );
+                        $balances[$memberId]->owe = (float)bcadd(
+                            (string)$balances[$memberId]->owe,
+                            (string)$debt->amount
+                        );
+
+                        continue;
+                    }
+
+                    if ($debt->to->id === $memberId) {
+                        $balances[$memberId]->balance = (float)bcadd(
+                            (string)$balances[$memberId]->balance,
+                            (string)$debt->amount
+                        );
+                        $balances[$memberId]->paid = (float)bcadd(
+                            (string)$balances[$memberId]->paid,
+                            (string)$debt->amount
+                        );
+                    }
+                }
+            }
+
+            return $balances;
         });
     }
 
