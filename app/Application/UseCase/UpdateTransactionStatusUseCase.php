@@ -7,11 +7,10 @@ namespace App\Application\UseCase;
 use App\Domain\Entity\ActivityLog;
 use App\Domain\Enum\ActivityLogActionTypeEnum;
 use App\Domain\Enum\StatusEnum;
+use App\Domain\Event\ActivityCreatedEvent;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
-use App\Events\ActivityCreated;
-use App\Infrastrstructure\API\Resource\ActivityResource;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -50,7 +49,7 @@ readonly class UpdateTransactionStatusUseCase
                 ]
             ));
 
-            ActivityCreated::dispatch($transaction->from->id, new ActivityResource($activityLog));
+            ActivityCreatedEvent::dispatch($transaction->from->id, $activityLog);
         });
     }
 }

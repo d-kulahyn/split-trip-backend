@@ -6,9 +6,8 @@ namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\Customer;
 use App\Domain\Entity\Expense;
-use App\Domain\Events\GroupCreatedEvent;
-use App\Domain\Events\GroupDeletedEvent;
-use App\Domain\Events\GroupUpdatedEvent;
+use App\Domain\Event\GroupDeletedEvent;
+use App\Domain\Event\GroupUpdatedEvent;
 use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
 use App\Models\Debtor;
@@ -125,13 +124,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                 ExpenseDebt::query()->insert($insert);
             }
 
-            if ($updated) {
-                GroupUpdatedEvent::dispatch($group->id);
-
-                return;
-            }
-
-            GroupCreatedEvent::dispatch($group->id);
+            GroupUpdatedEvent::dispatch($group);
         });
     }
 
@@ -147,7 +140,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             $result = $eloquentGroup->delete();
 
             if ($result) {
-                GroupDeletedEvent::dispatch($group->id);
+                GroupDeletedEvent::dispatch($group->getMemberIds());
             }
         }
 

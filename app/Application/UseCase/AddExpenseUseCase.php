@@ -12,11 +12,10 @@ use App\Domain\Entity\Debtor;
 use App\Domain\Entity\Expense;
 use App\Domain\Enum\ActivityLogActionTypeEnum;
 use App\Domain\Enum\StatusEnum;
+use App\Domain\Event\ActivityCreatedEvent;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 use App\Domain\Repository\BalanceWriteRepositoryInterface;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
-use App\Events\ActivityCreated;
-use App\Infrastrstructure\API\Resource\ActivityResource;
 use App\Infrastrstructure\Notification\Messages\ExpenseAddedMessage;
 use App\Infrastrstructure\Notification\PushNotification;
 use App\Jobs\NotificationJob;
@@ -126,7 +125,7 @@ class AddExpenseUseCase
             ));
 
             foreach ($group->getMemberIds->reject(fn(int $id) => $id === $customerId)->toArray() as $memberId) {
-                ActivityCreated::dispatch($memberId, new ActivityResource($activityLog));
+                ActivityCreatedEvent::dispatch($memberId, $activityLog);
                 NotificationJob::dispatch($this->notificationChannels, new ExpenseAddedMessage([
                     'amount'        => CurrencyHelper::currency_symbol($expense->credits(), $group->finalCurrency),
                     'customer_name' => $whoAdded->name,

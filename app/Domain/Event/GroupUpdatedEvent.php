@@ -1,31 +1,36 @@
 <?php
 
-namespace App\Domain\Events;
+namespace App\Domain\Event;
 
-use App\Infrastrstructure\API\Resource\TransactionResource;
+use App\Domain\Entity\Group;
+use App\Infrastrstructure\API\Resource\GroupResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TransactionCreated implements ShouldBroadcastNow
+class GroupUpdatedEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public TransactionResource $transaction,
-        public string $groupId
+        public Group $group,
     ) {}
 
     public function broadcastOn(): Channel
     {
-        return new Channel("group:{$this->groupId}");
+        return new Channel("group:{$this->group->id}");
+    }
+
+    public function broadcastWith(): array
+    {
+        return ['group' => new GroupResource($this->group)];
     }
 
     public function broadcastAs(): string
     {
-        return 'transactionCreated';
+        return 'groupUpdated';
     }
 
     /**

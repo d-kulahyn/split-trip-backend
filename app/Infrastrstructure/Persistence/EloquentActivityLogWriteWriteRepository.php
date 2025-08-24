@@ -6,7 +6,6 @@ namespace App\Infrastrstructure\Persistence;
 
 use App\Domain\Entity\ActivityLog;
 use App\Domain\Enum\StatusEnum;
-use App\Domain\Events\ActivityChangeEvent;
 use App\Domain\Repository\ActivityWriteRepositoryInterface;
 
 class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepositoryInterface
@@ -37,8 +36,6 @@ class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepository
         $activity->id = $eloquentActivityLog->id;
         $activity->createdAt = $eloquentActivityLog->created_at->getTimestamp();
 
-        ActivityChangeEvent::dispatch($activity->customerId);
-
         return $activity;
     }
 
@@ -48,6 +45,5 @@ class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepository
             ->whereIn('id', $ids)
             ->update(['status' => $status->value]);
 
-        ActivityChangeEvent::dispatch(auth()->id());
     }
 }

@@ -1,21 +1,22 @@
 <?php
 
-namespace App\Domain\Events;
+namespace App\Domain\Event;
 
-use App\Domain\Repository\GroupReadRepositoryInterface;
-use App\Infrastrstructure\API\Resource\GroupResource;
+use App\Domain\Entity\Transaction;
+use App\Infrastrstructure\API\Resource\TransactionResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GroupUpdatedEvent implements ShouldBroadcastNow
+class TransactionCreated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public string $groupId,
+        public Transaction $transaction,
+        public string $groupId
     ) {}
 
     public function broadcastOn(): Channel
@@ -25,14 +26,12 @@ class GroupUpdatedEvent implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        $repository = app(GroupReadRepositoryInterface::class);
-
-        return ['group' => new GroupResource($repository->findById($this->groupId))];
+        return ['transaction' => new TransactionResource($this->transaction)];
     }
 
     public function broadcastAs(): string
     {
-        return 'groupUpdated';
+        return 'transactionCreated';
     }
 
     /**

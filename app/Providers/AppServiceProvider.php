@@ -18,6 +18,7 @@ use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
+use App\Infrastrstructure\Caching\CachedGroupReadRepository;
 use App\Infrastrstructure\Persistence\EloquentActivityLogReadRepository;
 use App\Infrastrstructure\Persistence\EloquentActivityLogWriteWriteRepository;
 use App\Infrastrstructure\Persistence\EloquentCustomerReadRepository;
@@ -61,7 +62,14 @@ class AppServiceProvider extends ServiceProvider
 
         //groups
         $this->app->bind(GroupWriteRepositoryInterface::class, EloquentGroupWriteRepository::class);
-        $this->app->bind(GroupReadRepositoryInterface::class, EloquentGroupReadRepository::class);
+//        $this->app->bind(GroupReadRepositoryInterface::class, EloquentGroupReadRepository::class);
+        $this->app->bind(GroupReadRepositoryInterface::class, function ($app) {
+            return new CachedGroupReadRepository(
+                inner: $app->make(GroupReadRepositoryInterface::class),
+                cache: $app->make('cache.store'),
+                ttlSeconds: 30
+            );
+        });
 
         $this->app->bind(CurrencyReadRepositoryInterface::class, ExchangeRateApiCurrencyReadRepository::class);
 

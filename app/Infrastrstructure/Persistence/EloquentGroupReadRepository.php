@@ -8,7 +8,6 @@ use App\Models\Group;
 use Illuminate\Database\Eloquent\Builder;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Infrastrstructure\Mapper\GroupEloquentToDomainEntity;
-use Illuminate\Support\Facades\Cache;
 
 class EloquentGroupReadRepository implements GroupReadRepositoryInterface
 {
@@ -67,27 +66,25 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
      */
     public function list(int $customerId): array
     {
-        return Cache::remember("groups:{$customerId}", 3600, function () use ($customerId) {
-            $paginator = Group::query()
-                ->with([
-                    'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
-                    'members',
-                    'debts'
-                ])
-                ->where(function ($query) use ($customerId) {
-                    $query->where('created_by', $customerId)
-                        ->orWhereHas('members', function ($query) use ($customerId) {
-                            $query->where('customer_id', $customerId);
-                        });
-                })
-                ->orderBy('created_at', 'desc')
-                ->simplePaginate();
+        $paginator = Group::query()
+            ->with([
+                'expenses' => fn ($query) => $query->orderBy('created_at', 'desc'),
+                'members',
+                'debts'
+            ])
+            ->where(function ($query) use ($customerId) {
+                $query->where('created_by', $customerId)
+                    ->orWhereHas('members', function ($query) use ($customerId) {
+                        $query->where('customer_id', $customerId);
+                    });
+            })
+            ->orderBy('created_at', 'desc')
+            ->simplePaginate();
 
 
-            return array_map(function ($group) {
-                return GroupEloquentToDomainEntity::toEntity($group);
-            }, $paginator->items());
-        } );
+        return array_map(function ($group) {
+            return GroupEloquentToDomainEntity::toEntity($group);
+        }, $paginator->items());
     }
 
     /**
