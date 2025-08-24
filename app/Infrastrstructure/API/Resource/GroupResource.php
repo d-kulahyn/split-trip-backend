@@ -21,9 +21,12 @@ class GroupResource extends JsonResource
         /** @var Group $resource */
         $resource = $this->resource;
 
-        $members = $resource->getMembers();
-
+        $balances = $resource->getBalances();
         $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance())->toArray();
+
+        $customersWithGroupBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->setBalance($balances[$customer->id]))->toArray();
+
+        $members = $resource->getMembers();
 
         return [
             'debts'            => DebtResource::collection($resource->getDebts()),
@@ -36,7 +39,7 @@ class GroupResource extends JsonResource
             'expenses'         => ExpenseResource::collection($resource->getExpenses()),
             'my_balance'       => $resource->getBalanceOf(auth()->id()),
             'simplify_debts'   => $resource->simplifyDebts,
-            'balances'         => $resource->getBalances(),
+            'balances'         => $customersWithGroupBalances,
             'avatar'           => $resource->avatar !== null ? Storage::url($resource->avatar) : null,
             'overall_balance'  => $members[request()->user()->id]->getBalance(),
             'overall_balances' => $overallBalances,
