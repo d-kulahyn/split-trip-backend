@@ -109,10 +109,7 @@ class Customer extends Data
 
             /** @var Group $group */
             foreach ($groups as $group) {
-                $balances = $group->getBalances([$this->id]);
-
-                /** @var ?Balance $balance */
-                $balance = $balances[$this->id] ?? null;
+                $balance = $group->getBalanceOf($this->id);
 
                 if ($balance) {
                     $balance->owe = $currencyConverterService->convert($group->finalCurrency, $balance->owe, $this->currency);

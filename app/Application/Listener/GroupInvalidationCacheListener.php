@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 readonly class GroupInvalidationCacheListener
 {
     public function __construct(
-        public readonly GroupReadRepositoryInterface $groupReadRepository,
+        public GroupReadRepositoryInterface $groupReadRepository,
     ) {}
 
     public function handle(GroupUpdatedEvent|GroupDeletedEvent $event): void
