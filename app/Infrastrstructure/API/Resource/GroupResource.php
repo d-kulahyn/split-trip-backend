@@ -23,7 +23,7 @@ class GroupResource extends JsonResource
 
         $members = $resource->getMembers();
 
-        $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance());
+        $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance())->toArray();
 
         return [
             'debts'            => DebtResource::collection($resource->getDebts()),
