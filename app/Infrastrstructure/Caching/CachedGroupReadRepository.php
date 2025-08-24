@@ -17,13 +17,12 @@ readonly class CachedGroupReadRepository implements GroupReadRepositoryInterface
         private int $ttlSeconds = 3600,
     ) {}
 
-    public function list(int $customerId): array
-    {
-        $key = "customer:{$customerId}:groups:list";
+        public function list(int $customerId): array
+        {
+            $key = "customer:{$customerId}:groups";
 
-        return $this->cache->tags(["customer:{$customerId}", 'groups'])
-            ->remember($key, $this->ttlSeconds, fn () => $this->inner->list($customerId));
-    }
+            return $this->cache->remember($key, $this->ttlSeconds, fn () => $this->inner->list($customerId));
+        }
 
     public function findById(string $id, ?array $with = null): ?Group
     {

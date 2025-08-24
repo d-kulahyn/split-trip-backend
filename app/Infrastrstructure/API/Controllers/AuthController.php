@@ -10,6 +10,7 @@ use App\Application\UseCase\LogoutUserUseCase;
 use App\Application\UseCase\ResetPasswordUseCase;
 use App\Application\UseCase\SendConfirmationCodeToCustomerUseCase;
 use App\Application\UseCase\SocialAuthUseCase;
+use App\Domain\Entity\Group;
 use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\ActivityReadRepositoryInterface;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
@@ -23,6 +24,7 @@ use App\Infrastrstructure\API\DTO\SocialAuthDTO;
 use App\Infrastrstructure\API\Resource\ActivityResource;
 use App\Infrastrstructure\API\Resource\GroupResource;
 use App\Infrastrstructure\API\Resource\TransactionResource;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
 use Random\RandomException;
@@ -40,6 +42,8 @@ readonly class AuthController
      * @param SendConfirmationCodeToCustomerUseCase $sendConfirmationCodeToCustomerUseCase
      * @param CustomerReadRepositoryInterface $customerReadRepository
      * @param GroupReadRepositoryInterface $groupReadRepository
+     * @param TransactionReadRepositoryInterface $transactionReadRepository
+     * @param ActivityReadRepositoryInterface $activityReadRepository
      */
     public function __construct(
         protected CreateUserUseCase $createUserUseCase,
@@ -81,6 +85,7 @@ readonly class AuthController
     public function login(LoginDTO $loginDTO): JsonResponse
     {
         $token = $this->loginUserUseCase->execute($loginDTO);
+
         if (is_null($token)) {
             return response()->json(['message' => 'Bad login or password.'], ResponseAlias::HTTP_BAD_REQUEST);
         }

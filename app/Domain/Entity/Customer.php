@@ -8,10 +8,13 @@ use App\Domain\Enum\DebtReminderPeriodEnum;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use App\Infrastrstructure\Service\CurrencyConverterService;
+use Illuminate\Support\Facades\Cache;
 use Spatie\LaravelData\Data;
 
 class Customer extends Data
 {
+    private const BALANCE_CACHE_TTL = 3600;
+
     /**
      * @param string $password
      * @param string $email
@@ -90,38 +93,41 @@ class Customer extends Data
             return $this->balance;
         }
 
-        $customerReadRepository = app(CustomerReadRepositoryInterface::class);
-        $currencyConverterService = app(CurrencyConverterService::class);
+        return Cache::remember("customer:{$this->id}:balance", self::BALANCE_CACHE_TTL, function () {
 
-        $groups = $customerReadRepository->groups($this->id);
+            $customerReadRepository = app(CustomerReadRepositoryInterface::class);
+            $currencyConverterService = app(CurrencyConverterService::class);
 
-        $generalBalance = new Balance(
-            owe    : 0,
-            paid   : 0,
-            balance: 0,
-            customerId: $this->id,
-        );
+            $groups = $customerReadRepository->groups($this->id);
 
-        /** @var Group $group */
-        foreach ($groups as $group) {
-            $balances = $group->getBalances([$this->id]);
+            $generalBalance = new Balance(
+                owe    : 0,
+                paid   : 0,
+                balance: 0,
+                customerId: $this->id,
+            );
 
-            /** @var ?Balance $balance */
-            $balance = $balances[$this->id] ?? null;
+            /** @var Group $group */
+            foreach ($groups as $group) {
+                $balances = $group->getBalances([$this->id]);
 
-            if ($balance) {
-                $balance->owe = $currencyConverterService->convert($group->finalCurrency, $balance->owe, $this->currency);
-                $balance->paid = $currencyConverterService->convert($group->finalCurrency, $balance->paid, $this->currency);
-                $balance->balance = (float)bcsub((string)$balance->paid, (string)$balance->owe);
+                /** @var ?Balance $balance */
+                $balance = $balances[$this->id] ?? null;
 
-                $generalBalance->owe = (float)bcadd((string)$generalBalance->owe, (string)$balance->owe);
-                $generalBalance->paid = (float)bcadd((string)$generalBalance->paid, (string)$balance->paid);
-                $generalBalance->balance = (float)bcadd((string)$generalBalance->balance, (string)$balance->balance);
+                if ($balance) {
+                    $balance->owe = $currencyConverterService->convert($group->finalCurrency, $balance->owe, $this->currency);
+                    $balance->paid = $currencyConverterService->convert($group->finalCurrency, $balance->paid, $this->currency);
+                    $balance->balance = (float)bcsub((string)$balance->paid, (string)$balance->owe);
+
+                    $generalBalance->owe = (float)bcadd((string)$generalBalance->owe, (string)$balance->owe);
+                    $generalBalance->paid = (float)bcadd((string)$generalBalance->paid, (string)$balance->paid);
+                    $generalBalance->balance = (float)bcadd((string)$generalBalance->balance, (string)$balance->balance);
+                }
             }
-        }
 
-        $this->balance = $generalBalance;
+            $this->balance = $generalBalance;
 
-        return $generalBalance;
+            return $generalBalance;
+        });
     }
 }

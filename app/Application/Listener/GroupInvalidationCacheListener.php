@@ -12,8 +12,11 @@ readonly class GroupInvalidationCacheListener
 {
     public function handle(GroupUpdatedEvent|GroupDeletedEvent $event): void
     {
-        foreach ($event->group->getMemberIds() as $uid) {
-            Cache::tags(["customer:{$uid}", 'groups'])->flush();
+        Cache::forget("group:{$event->group->id}:balances");
+
+        foreach ($event->group->getMemberIds() as $customerId) {
+            Cache::forget("customer:{$customerId}:groups");
+            Cache::forget("customer:{$customerId}:balance");
         }
     }
 }
