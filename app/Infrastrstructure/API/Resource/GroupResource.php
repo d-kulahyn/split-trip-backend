@@ -23,14 +23,14 @@ class GroupResource extends JsonResource
 
         $balances = $resource->getBalances();
 
+        $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance())->toArray();
+
         try {
-            $overallBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->getBalance())->toArray();
+            $customersWithGroupBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->setBalance($balances[$customer->id]))->toArray();
         } catch (\Throwable $exception) {
             header('Content-Type: application/json');
             echo json_encode([$balances, $resource->getMemberIds()]);die;
         }
-
-        $customersWithGroupBalances = $resource->getMembers->map(fn (Customer $customer) => $customer->setBalance($balances[$customer->id]))->toArray();
 
         $members = $resource->getMembers();
 
