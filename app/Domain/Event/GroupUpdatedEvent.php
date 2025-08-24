@@ -27,7 +27,7 @@ class GroupUpdatedEvent implements ShouldBroadcastNow
     {
         $groupRepository = app(GroupReadRepositoryInterface::class);
 
-        return ['group' => new GroupResource($groupRepository->getById($this->groupId))];
+        return ['group' => new GroupResource($groupRepository->findById($this->groupId))];
     }
 
     public function broadcastAs(): string
