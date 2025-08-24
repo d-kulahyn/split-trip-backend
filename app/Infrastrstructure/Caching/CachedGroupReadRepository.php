@@ -19,9 +19,9 @@ readonly class CachedGroupReadRepository implements GroupReadRepositoryInterface
 
     public function list(int $customerId): array
     {
-        $key = "user:{$customerId}:groups:list";
+        $key = "customer:{$customerId}:groups:list";
 
-        return $this->cache->tags(["user:{$customerId}", 'groups'])
+        return $this->cache->tags(["customer:{$customerId}", 'groups'])
             ->remember($key, $this->ttlSeconds, fn () => $this->inner->list($customerId));
     }
 

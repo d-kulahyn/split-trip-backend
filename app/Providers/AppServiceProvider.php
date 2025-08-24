@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
 //        $this->app->bind(GroupReadRepositoryInterface::class, EloquentGroupReadRepository::class);
         $this->app->bind(GroupReadRepositoryInterface::class, function ($app) {
             return new CachedGroupReadRepository(
-                inner: $app->make(GroupReadRepositoryInterface::class),
+                inner: $app->make(EloquentGroupReadRepository::class),
                 cache: $app->make('cache.store'),
                 ttlSeconds: 30
             );
