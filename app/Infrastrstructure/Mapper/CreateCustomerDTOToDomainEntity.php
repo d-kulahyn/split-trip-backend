@@ -21,6 +21,7 @@ class CreateCustomerDTOToDomainEntity
             email                         : $createUserDTO->email,
             firebase_cloud_messaging_token: $createUserDTO->firebase_cloud_messaging_token,
             name                          : $createUserDTO->name,
+            currency                      : $createUserDTO->currency,
             avatar_color                  : $createUserDTO->avatar_color,
         );
     }

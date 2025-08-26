@@ -13,11 +13,17 @@ return new class extends Migration {
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('group_id')->constrained()->onDelete('cascade');
             $table->string('action_type');
-            $table->string('status')->default(StatusEnum::PENDING->value);
             $table->jsonb('details');
+            $table->timestamps();
+        });
+
+        Schema::create('activity_log_customer', function (Blueprint $table) {
+            $table->primary(['activity_log_id', 'customer_id']);
+            $table->foreignId('activity_log_id')->constrained('activity_logs')->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->string('status')->default(StatusEnum::PENDING->value);
             $table->timestamps();
         });
     }
@@ -28,5 +34,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('activity_logs');
+        Schema::dropIfExists('activity_log_customer');
     }
 };

@@ -12,6 +12,7 @@ use App\Models\ExpenseDebt;
 use App\Domain\Entity\Group;
 use App\Models\Debtor;
 use App\Models\Payer;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Domain\Repository\GroupWriteRepositoryInterface;
 
@@ -125,6 +126,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             }
 
             GroupUpdatedEvent::dispatch($group->id);
+            $this->invalidateCache($group);
         });
     }
 
@@ -140,10 +142,19 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
             $result = $eloquentGroup->delete();
 
             if ($result) {
-                GroupDeletedEvent::dispatch($group->getMemberIds());
+                GroupDeletedEvent::dispatch($group->id);
+                $this->invalidateCache($group);
             }
         }
 
         return false;
+    }
+
+    private function invalidateCache(Group $group): void
+    {
+        foreach ($group->getMemberIds() as $customerId) {
+            Cache::forget("customer:{$customerId}:groups");
+            Cache::forget("customer:{$customerId}:balance");
+        }
     }
 }

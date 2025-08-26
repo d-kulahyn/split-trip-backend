@@ -105,12 +105,10 @@ class AddExpenseUseCase
 
             //TODO: generate event for expense creation
             $activityLog = $this->activityWriteRepository->save(new ActivityLog(
-                customerId: $customerId,
                 groupId   : $groupId,
                 groupName : $group->name,
                 actionType: ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
                 customer  : $whoAdded,
-                status    : StatusEnum::READ,
                 details   : [
                     'amount' => $expense->credits(),
                 ]

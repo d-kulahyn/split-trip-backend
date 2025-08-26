@@ -10,6 +10,7 @@ class CreateUserDTO extends Data
         public string $password,
         public string $email,
         public string $avatar_color,
+        public string $currency = 'USD',
         public ?string $name = null,
         public ?string $firebase_cloud_messaging_token = null,
     ) {}

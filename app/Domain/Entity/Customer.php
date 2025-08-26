@@ -47,7 +47,7 @@ class Customer extends Data
         public ?string $name = null,
         public ?string $avatar = null,
         public ?int $id = null,
-        public ?string $currency = null,
+        public string $currency = 'USD',
         public ?Balance $balance = null,
         public ?string $avatar_color = null,
     ) {}

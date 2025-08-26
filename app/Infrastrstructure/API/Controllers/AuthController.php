@@ -99,11 +99,7 @@ readonly class AuthController
                 auth()->id()
             )),
             'activities'   => ActivityResource::collection(
-                $this->activityReadRepository->list(
-                    StatusEnum::PENDING,
-                    auth()->id(),
-                    ['group', 'customer']
-                )
+                $this->activityReadRepository->list(StatusEnum::PENDING, auth()->id())
             ),
         ]);
     }

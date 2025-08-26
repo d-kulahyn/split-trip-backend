@@ -24,14 +24,14 @@ class EloquentActivityLogWriteWriteRepository implements ActivityWriteRepository
         }
 
         $eloquentActivityLog->fill([
-            'customer_id' => $activity->customerId,
             'group_id'    => $activity->groupId,
             'action_type' => $activity->actionType->value,
             'details'     => $activity->details,
-            'status'      => $activity->status->value,
         ]);
 
         $eloquentActivityLog->save();
+
+        $eloquentActivityLog->customers()->sync($activity->customerIds);
 
         $activity->id = $eloquentActivityLog->id;
         $activity->createdAt = $eloquentActivityLog->created_at->getTimestamp();

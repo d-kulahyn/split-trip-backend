@@ -13,16 +13,15 @@ use Illuminate\Support\Collection;
 class EloquentActivityLogReadRepository implements ActivityReadRepositoryInterface
 {
 
-    public function list(StatusEnum $status, int $to, array $with = []): Collection
+    public function list(StatusEnum $status, int $to): Collection
     {
         return \App\Models\ActivityLog::query()
-            ->where('status', $status->value)
-            ->where('customer_id', $to)
-            ->with($with)
+            ->with(['members' => function ($query) use ($status){
+                $query->where('status', $status->value);
+            }])
             ->get()
             ->map(function (\App\Models\ActivityLog $activityLog) {
                 return new ActivityLog(
-                    customerId: $activityLog->customer_id,
                     groupId   : $activityLog->group_id,
                     groupName : $activityLog->group->name,
                     actionType: $activityLog->action_type,
@@ -30,7 +29,6 @@ class EloquentActivityLogReadRepository implements ActivityReadRepositoryInterfa
                         ? CustomerEloquentToDomainEntity::toEntity($activityLog->customer)
                         : null,
                     createdAt : $activityLog->created_at ? $activityLog->created_at->getTimestamp() : null,
-                    status    : $activityLog->status,
                     details   : $activityLog->details,
                     id        : $activityLog->id
                 );

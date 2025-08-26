@@ -7,6 +7,7 @@ use App\Domain\Enum\StatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ActivityLog extends Model
 {
@@ -28,20 +29,20 @@ class ActivityLog extends Model
      * @var string[]
      */
     protected $fillable = [
-        'customer_id',
         'group_id',
         'action_type',
         'details',
         'status',
     ];
 
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
-    }
 
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class);
+    }
+
+    public function customers(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domain\Entity\Customer::class, 'activity_logs_customers', 'activity_log_id', 'customer_id');
     }
 }
