@@ -39,7 +39,7 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
      *
      * @return \App\Domain\Entity\Group|null
      */
-    public function findById(string $id, ?array $with = null): ?\App\Domain\Entity\Group
+    public function findById(string $id, ?array $with = null, bool $lock = false): ?\App\Domain\Entity\Group
     {
         if ($with === null) {
             $with = [
@@ -49,7 +49,7 @@ class EloquentGroupReadRepository implements GroupReadRepositoryInterface
             ];
         }
 
-        $groupEloquent = Group::with($with)->find($id);
+        $groupEloquent = Group::with($with)->where('id', $id)->lockForUpdate()->first();
 
         if (!$groupEloquent) {
 

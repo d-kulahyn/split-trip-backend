@@ -13,6 +13,7 @@ use App\Application\UseCase\SocialAuthUseCase;
 use App\Domain\Entity\Group;
 use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\ActivityReadRepositoryInterface;
+use App\Domain\Repository\CurrencyReadRepositoryInterface;
 use App\Domain\Repository\CustomerReadRepositoryInterface;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
@@ -58,6 +59,7 @@ readonly class AuthController
         protected GroupReadRepositoryInterface $groupReadRepository,
         protected TransactionReadRepositoryInterface $transactionReadRepository,
         protected ActivityReadRepositoryInterface $activityReadRepository,
+        protected CurrencyReadRepositoryInterface $currencyReadRepository
     ) {}
 
     /**
@@ -101,6 +103,7 @@ readonly class AuthController
             'activities'   => ActivityResource::collection(
                 $this->activityReadRepository->list(StatusEnum::PENDING, auth()->id())
             ),
+            'codes' => $this->currencyReadRepository->codes()
         ]);
     }
 

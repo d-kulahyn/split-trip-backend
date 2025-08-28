@@ -39,7 +39,7 @@ readonly class UpdateExpenseUseCase
     public function execute(ExpenseDTO $expenseDTO, string $groupId, int $expenseId, int $customerId): Expense
     {
         $result = DB::transaction(function () use ($expenseDTO, $groupId, $customerId, $expenseId) {
-            $group = $this->groupReadRepository->findById($groupId);
+            $group = $this->groupReadRepository->findById($groupId, lock: true);
 
             if (!$group->hasMember($customerId)) {
                 return false;

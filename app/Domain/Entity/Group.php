@@ -217,14 +217,8 @@ class Group
     /**
      * @throws DebtException
      */
-    public function updateDebtAmount(int $debtId, float $amount): void
+    public function updateDebtAmount(Debt $debt, float $amount): void
     {
-        $debt = $this->getDebtById($debtId);
-
-        if (!$debt) {
-            throw new DebtException('Debt not found.');
-        }
-
         if ($amount <= 0 || $amount > $debt->amount) {
             throw new DebtException('Invalid amount provided.');
         }

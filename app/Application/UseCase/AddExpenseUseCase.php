@@ -60,7 +60,7 @@ class AddExpenseUseCase
     public function execute(ExpenseDTO $expenseDTO, string $groupId, int $customerId): Group
     {
         $result = DB::transaction(function () use ($expenseDTO, $groupId, $customerId) {
-            $group = $this->groupReadRepository->findById($groupId);
+            $group = $this->groupReadRepository->findById($groupId, lock: true);
 
             if (!$group->hasMember($customerId)) {
                 return false;
@@ -105,11 +105,13 @@ class AddExpenseUseCase
 
             //TODO: generate event for expense creation
             $activityLog = $this->activityWriteRepository->save(new ActivityLog(
-                groupId   : $groupId,
-                groupName : $group->name,
-                actionType: ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
-                customer  : $whoAdded,
-                details   : [
+                groupId    : $groupId,
+                groupName  : $group->name,
+                actionType : ActivityLogActionTypeEnum::EXPENSE_ADDED_TO_GROUP,
+                customerIds: $group->getMemberIds(),
+                createdBy  : $whoAdded,
+                status     : StatusEnum::PENDING,
+                details    : [
                     'amount' => $expense->credits(),
                 ]
             ));

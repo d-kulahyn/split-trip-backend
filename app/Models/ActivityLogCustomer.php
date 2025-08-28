@@ -13,7 +13,7 @@ class ActivityLogCustomer extends Model
     /**
      * @var string
      */
-    protected $table = 'activity_logs_customer';
+    protected $table = 'activity_log_customer';
 
     /**
      * @var string[]

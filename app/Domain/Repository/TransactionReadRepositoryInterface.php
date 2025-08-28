@@ -10,4 +10,5 @@ interface TransactionReadRepositoryInterface
 {
     public function list(StatusEnum $status, int $to): Collection;
     public function getById(int $id): ?Transaction;
+    public function getPendingAmount(int $to);
 }

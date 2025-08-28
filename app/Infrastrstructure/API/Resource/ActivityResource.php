@@ -18,14 +18,13 @@ class ActivityResource extends JsonResource
 
         return [
             'id'          => $resource->id,
-            'customer_id' => $resource->customerId,
             'group_id'    => $resource->groupId,
             'group_name'  => $resource->groupName,
             'action_type' => $resource->actionType,
             'details'     => $resource->details,
+            'created_by'  => new CustomerResource($resource->createdBy),
             'created_at'  => $resource->createdAt,
             'status'      => $resource->status->value,
-            'customer'    => $resource->customer ? new CustomerResource($resource->customer) : null,
         ];
     }
 }

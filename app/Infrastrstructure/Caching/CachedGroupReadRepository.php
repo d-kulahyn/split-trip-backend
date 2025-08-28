@@ -24,7 +24,7 @@ readonly class CachedGroupReadRepository implements GroupReadRepositoryInterface
             return $this->cache->remember($key, $this->ttlSeconds, fn () => $this->inner->list($customerId));
         }
 
-    public function findById(string $id, ?array $with = null): ?Group
+    public function findById(string $id, ?array $with = null, bool $lock = false): ?Group
     {
         return $this->inner->findById($id, $with);
     }

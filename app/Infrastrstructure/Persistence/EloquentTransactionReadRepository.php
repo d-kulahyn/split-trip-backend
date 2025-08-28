@@ -8,6 +8,7 @@ use App\Domain\Entity\Transaction;
 use App\Domain\Enum\StatusEnum;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Infrastrstructure\Mapper\CustomerEloquentToDomainEntity;
+use App\Infrastrstructure\Mapper\GroupEloquentToDomainEntity;
 use Illuminate\Support\Collection;
 
 class EloquentTransactionReadRepository implements TransactionReadRepositoryInterface
@@ -38,7 +39,7 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
     {
         $transaction = \App\Models\Transaction::query()
             ->where('id', $id)
-            ->with(['group' => fn($query) => $query->select(['id', 'name'])])
+            ->with(['group'])
             ->first();
 
         if (!$transaction) {
@@ -53,7 +54,16 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
             groupId  : $transaction->group_id,
             groupName: $transaction->group->name,
             id       : $transaction->id,
+            group    : GroupEloquentToDomainEntity::toEntity($transaction->group),
             status   : $transaction->status,
         );
+    }
+
+    public function getPendingAmount(int $to): float
+    {
+        return (float)\App\Models\Transaction::query()
+            ->where('status', StatusEnum::PENDING)
+            ->where('to', $to)
+            ->sum('amount');
     }
 }

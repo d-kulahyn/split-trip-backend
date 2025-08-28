@@ -32,6 +32,7 @@ class ActivityLog extends Model
         'group_id',
         'action_type',
         'details',
+        'created_by',
         'status',
     ];
 
@@ -41,8 +42,13 @@ class ActivityLog extends Model
         return $this->belongsTo(Group::class);
     }
 
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'created_by');
+    }
+
     public function customers(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domain\Entity\Customer::class, 'activity_logs_customers', 'activity_log_id', 'customer_id');
+        return $this->belongsToMany(Customer::class, 'activity_log_customer', 'activity_log_id', 'customer_id');
     }
 }

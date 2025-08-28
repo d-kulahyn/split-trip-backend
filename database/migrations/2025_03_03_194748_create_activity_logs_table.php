@@ -14,6 +14,7 @@ return new class extends Migration {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('group_id')->constrained()->onDelete('cascade');
+            $table->foreignId('created_by')->constrained('customers')->onDelete('cascade');
             $table->string('action_type');
             $table->jsonb('details');
             $table->timestamps();
@@ -33,7 +34,12 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('activity_logs');
+        Schema::table('activity_log_customer', function (Blueprint $table) {
+            $table->dropForeign('activity_log_customer_activity_log_id_foreign');
+            $table->dropForeign('activity_log_customer_customer_id_foreign');
+        });
+
         Schema::dropIfExists('activity_log_customer');
+        Schema::dropIfExists('activity_logs');
     }
 };

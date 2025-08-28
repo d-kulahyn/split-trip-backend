@@ -25,7 +25,7 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
      */
     public function save(Group $group): void
     {
-        DB::transaction(function () use ($group) {
+        $result = DB::transaction(function () use ($group) {
             $updated = $group->id !== null;
 
             $eloquentGroup = \App\Models\Group::updateOrCreate(
@@ -125,9 +125,13 @@ class EloquentGroupWriteRepository implements GroupWriteRepositoryInterface
                 ExpenseDebt::query()->insert($insert);
             }
 
+           return true;
+        });
+
+        if ($result) {
             GroupUpdatedEvent::dispatch($group->id);
             $this->invalidateCache($group);
-        });
+        }
     }
 
     /**

@@ -30,7 +30,7 @@ readonly class DeleteExpenseUseCase
     public function execute(string $groupId, int $expenseId, int $customerId): bool
     {
         return DB::transaction(function () use ($groupId, $expenseId, $customerId) {
-            $group = $this->groupReadRepository->findById($groupId);
+            $group = $this->groupReadRepository->findById($groupId, lock: true);
 
             $group->removeExpense($expenseId);
 

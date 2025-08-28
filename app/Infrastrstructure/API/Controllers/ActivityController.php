@@ -26,7 +26,7 @@ class ActivityController
 
     public function statusBatch(StatusUpdateBatchDTO $statusUpdateBatchDTO): \Illuminate\Http\JsonResponse
     {
-        $this->activityWriteRepository->updateStatuses($statusUpdateBatchDTO->ids, $statusUpdateBatchDTO->status);
+        $this->activityWriteRepository->updateStatuses($statusUpdateBatchDTO->ids, auth()->id(), $statusUpdateBatchDTO->status);
 
         return response()->json([
             'message' => 'Statuses updated successfully',
