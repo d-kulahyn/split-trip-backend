@@ -34,12 +34,12 @@ return new class extends Migration {
      */
     public function down(): void
     {
-//        Schema::table('activity_log_customer', function (Blueprint $table) {
-//            $table->dropForeign('activity_log_customer_activity_log_id_foreign');
-//            $table->dropForeign('activity_log_customer_customer_id_foreign');
-//        });
+        Schema::table('activity_log_customer', function (Blueprint $table) {
+            $table->dropForeign('activity_log_customer_activity_log_id_foreign');
+            $table->dropForeign('activity_log_customer_customer_id_foreign');
+        });
 
-        Schema::dropIfExists('activity_logs_customer');
+        Schema::dropIfExists('activity_log_customer');
         Schema::dropIfExists('activity_logs');
     }
 };
