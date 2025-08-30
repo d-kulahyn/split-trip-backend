@@ -12,6 +12,7 @@ use App\Domain\Repository\GroupWriteRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
 use App\Domain\ValueObject\Balance;
 use App\Domain\Services\DebtDistributor;
+use App\Infrastrstructure\Service\CurrencyConverterService;
 use Illuminate\Support\Facades\Cache;
 
 class Group
@@ -217,8 +218,14 @@ class Group
     /**
      * @throws DebtException
      */
-    public function updateDebtAmount(Debt $debt, float $amount): void
+    public function updateDebtAmount(Debt $debt, float $amount, string $currency): void
     {
+        if ($debt->currency !== $currency) {
+            $currencyConverterService = app(CurrencyConverterService::class);
+
+            $amount = $currencyConverterService->convert($currency, $amount, $debt->currency);
+        }
+
         if ($amount <= 0 || $amount > $debt->amount) {
             throw new DebtException('Invalid amount provided.');
         }

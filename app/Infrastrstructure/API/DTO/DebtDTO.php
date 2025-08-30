@@ -10,9 +10,11 @@ class DebtDTO extends Data
 {
     /**
      * @param float $amount
+     * @param string $currency
      */
     public function __construct(
         public float $amount,
+        public string $currency
     ) {}
 
     /**
@@ -24,6 +26,7 @@ class DebtDTO extends Data
     {
         return [
             'amount' => 'required|numeric|min:0.01|max:99999999.99',
+            'currency' => 'required|string'
         ];
     }
 }

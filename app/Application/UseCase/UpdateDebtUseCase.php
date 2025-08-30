@@ -49,7 +49,7 @@ readonly class UpdateDebtUseCase
                 from    : $debt->from,
                 to      : $debt->to,
                 amount  : $debtDTO->amount,
-                currency: $debt->currency,
+                currency: $debtDTO->currency,
                 groupId : $debt->groupId,
                 groupName: $this->groupReadRepository->getNameById($groupId),
             )

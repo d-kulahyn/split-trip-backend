@@ -54,7 +54,7 @@ readonly class UpdateTransactionStatusUseCase
                     throw new InvalidArgumentException('Debt not found');
                 }
 
-                $group->updateDebtAmount($debt, $transaction->amount);
+                $group->updateDebtAmount($debt, $transaction->amount, $transaction->currency);
                 $this->groupWriteRepository->save($group);
             }
 
