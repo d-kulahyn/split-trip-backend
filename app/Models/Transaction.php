@@ -19,6 +19,7 @@ class Transaction extends Model
     protected $casts = [
         'status' => StatusEnum::class,
         'amount' => 'float',
+        'rate' => 'float',
     ];
 
     /**
