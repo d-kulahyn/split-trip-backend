@@ -218,12 +218,19 @@ class Group
     /**
      * @throws DebtException
      */
-    public function updateDebtAmount(Debt $debt, float $amount, string $currency): void
+    public function updateDebtAmount(Debt $debt, Transaction $transaction): void
     {
-        if ($debt->currency !== $currency) {
+        $amount = $transaction->amount;
+
+        if ($debt->currency !== $transaction->currency) {
             $currencyConverterService = app(CurrencyConverterService::class);
 
-            $amount = $currencyConverterService->convert($currency, $amount, $debt->currency);
+            $amount = $currencyConverterService->convert(
+                $transaction->currency,
+                $transaction->amount,
+                $debt->currency,
+                $transaction->rate
+            );
         }
 
         if ($amount <= 0 || $amount > $debt->amount) {

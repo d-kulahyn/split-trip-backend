@@ -29,8 +29,9 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
                     currency : $transaction->currency,
                     groupId  : $transaction->group_id,
                     groupName: $transaction->group->name,
+                    rate     : $transaction->rate,
                     id       : $transaction->id,
-                    status   : $transaction->status,
+                    status   : $transaction->status
                 );
             });
     }
@@ -53,9 +54,10 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
             currency : $transaction->currency,
             groupId  : $transaction->group_id,
             groupName: $transaction->group->name,
+            rate     : $transaction->rate,
             id       : $transaction->id,
             group    : GroupEloquentToDomainEntity::toEntity($transaction->group),
-            status   : $transaction->status,
+            status   : $transaction->status
         );
     }
 

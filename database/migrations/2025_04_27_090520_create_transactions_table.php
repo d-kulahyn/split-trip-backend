@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->float('amount');
+            $table->float('rate');
             $table->unsignedInteger('from')->nullable(false);
             $table->unsignedInteger('to')->nullable(false);
             $table->string('currency');

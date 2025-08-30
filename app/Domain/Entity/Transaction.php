@@ -17,6 +17,7 @@ class Transaction extends Data
         public string $currency,
         public string $groupId,
         public string $groupName,
+        public float $rate,
         public ?int $id = null,
         public ?Group $group = null,
         public StatusEnum $status = StatusEnum::PENDING

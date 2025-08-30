@@ -31,6 +31,7 @@ class Transaction extends Model
         'currency',
         'status',
         'group_id',
+        'rate'
     ];
 
     public function group(): BelongsTo
