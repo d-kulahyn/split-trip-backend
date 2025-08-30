@@ -27,7 +27,7 @@ class CurrencyConverterService
      */
     public function convert(string $fromCurrency, float $amount, string $toCurrency, ?float $rate = null): float
     {
-        $this->rates[$toCurrency] = $rate;
+        $this->rates[$toCurrency][$fromCurrency] = $rate;
 
         if (empty($this->rates[$toCurrency])) {
             $this->rates[$toCurrency] = $this->currencyReadRepository->rates($toCurrency);
