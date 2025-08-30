@@ -23,10 +23,10 @@ class ExchangeRateApiCurrencyReadRepository implements CurrencyReadRepositoryInt
             $rates = $response->json()['conversion_rates'] ?? [];
 
             foreach ($rates as $currency => $rate) {
-                $rates[$currency] = round($rate);
+                $rates[$currency] = round($rate, 2);
             }
 
-            return $response->json()['conversion_rates'] ?? [];
+            return $rates;
         });
     }
 
