@@ -21,6 +21,7 @@ class EloquentTransactionWriteRepository implements TransactionWriteRepositoryIn
             [
                 'amount'   => $transaction->amount,
                 'currency' => $transaction->currency,
+                'rate'     => $transaction->rate,
                 'from'     => $transaction->from->id,
                 'to'       => $transaction->to->id,
                 'group_id' => $transaction->groupId,
