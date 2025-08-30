@@ -20,6 +20,12 @@ class ExchangeRateApiCurrencyReadRepository implements CurrencyReadRepositoryInt
         return Cache::remember("exchange_rates_{$base}", 3600, function () use ($base) {
             $response = Http::get("https://v6.exchangerate-api.com/v6/367e15268baf3c1e498c0df2/latest/{$base}");
 
+            $rates = $response->json()['conversion_rates'] ?? [];
+
+            foreach ($rates as $currency => $rate) {
+                $rates[$currency] = round($rate);
+            }
+
             return $response->json()['conversion_rates'] ?? [];
         });
     }
