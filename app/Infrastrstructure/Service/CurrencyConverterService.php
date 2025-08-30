@@ -29,7 +29,7 @@ class CurrencyConverterService
     {
         $this->rates[$toCurrency][$fromCurrency] = $rate;
 
-        if (empty($this->rates[$toCurrency])) {
+        if (empty($this->rates[$toCurrency]) || $rate === null) {
             $this->rates[$toCurrency] = $this->currencyReadRepository->rates($toCurrency);
         }
 
