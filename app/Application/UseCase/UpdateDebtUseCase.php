@@ -6,12 +6,12 @@ namespace App\Application\UseCase;
 
 use App\Domain\Entity\Transaction;
 use App\Domain\Event\TransactionCreated;
+use App\Domain\Repository\CurrencyReadRepositoryInterface;
 use App\Domain\Repository\GroupReadRepositoryInterface;
 use App\Domain\Repository\TransactionReadRepositoryInterface;
 use App\Infrastrstructure\API\DTO\DebtDTO;
 use App\Domain\Repository\DebtReadRepositoryInterface;
 use App\Domain\Repository\TransactionWriteRepositoryInterface;
-use Google\Cloud\Core\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 readonly class UpdateDebtUseCase
@@ -20,7 +20,8 @@ readonly class UpdateDebtUseCase
         private GroupReadRepositoryInterface $groupReadRepository,
         private DebtReadRepositoryInterface $debtReadRepository,
         private TransactionWriteRepositoryInterface $transactionWriteRepository,
-        private TransactionReadRepositoryInterface $transactionReadRepository
+        private TransactionReadRepositoryInterface $transactionReadRepository,
+        private CurrencyReadRepositoryInterface $currencyReadRepository
     ) {}
 
     /**
@@ -44,14 +45,17 @@ readonly class UpdateDebtUseCase
             throw new BadRequestHttpException('Invalid amount');
         }
 
+        $rates = $this->currencyReadRepository->rates($debt->currency);
+
         $transaction = $this->transactionWriteRepository->save(
             new Transaction(
-                from    : $debt->from,
-                to      : $debt->to,
-                amount  : $debtDTO->amount,
-                currency: $debtDTO->currency,
-                groupId : $debt->groupId,
+                from     : $debt->from,
+                to       : $debt->to,
+                amount   : $debtDTO->amount,
+                currency : $debtDTO->currency,
+                groupId  : $debt->groupId,
                 groupName: $this->groupReadRepository->getNameById($groupId),
+                rate     : $rates[$debtDTO->currency],
             )
         );
 
