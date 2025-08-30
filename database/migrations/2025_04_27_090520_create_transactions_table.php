@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('from')->nullable(false);
             $table->unsignedInteger('to')->nullable(false);
             $table->string('currency');
+            $table->string('base_currency');
             $table->string('status')->nullable(false)->default(\App\Domain\Enum\StatusEnum::PENDING->value);
             $table->timestamps();
 

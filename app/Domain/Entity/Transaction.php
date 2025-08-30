@@ -15,6 +15,7 @@ class Transaction extends Data
         public Customer $to,
         public float $amount,
         public string $currency,
+        public string $baseCurrency,
         public string $groupId,
         public string $groupName,
         public float $rate,

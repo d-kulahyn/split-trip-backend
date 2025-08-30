@@ -49,13 +49,14 @@ readonly class UpdateDebtUseCase
 
         $transaction = $this->transactionWriteRepository->save(
             new Transaction(
-                from     : $debt->from,
-                to       : $debt->to,
-                amount   : $debtDTO->amount,
-                currency : $debtDTO->currency,
-                groupId  : $debt->groupId,
-                groupName: $this->groupReadRepository->getNameById($groupId),
-                rate     : $rates[$debtDTO->currency],
+                from        : $debt->from,
+                to          : $debt->to,
+                amount      : $debtDTO->amount,
+                currency    : $debtDTO->currency,
+                baseCurrency: $debt->currency,
+                groupId     : $debt->groupId,
+                groupName   : $this->groupReadRepository->getNameById($groupId),
+                rate        : $rates[$debtDTO->currency],
             )
         );
 

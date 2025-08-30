@@ -23,15 +23,16 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
             ->get()
             ->map(function (\App\Models\Transaction $transaction) {
                 return new Transaction(
-                    from     : CustomerEloquentToDomainEntity::toEntity($transaction->fromC),
-                    to       : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
-                    amount   : $transaction->amount,
-                    currency : $transaction->currency,
-                    groupId  : $transaction->group_id,
-                    groupName: $transaction->group->name,
-                    rate     : $transaction->rate,
-                    id       : $transaction->id,
-                    status   : $transaction->status
+                    from        : CustomerEloquentToDomainEntity::toEntity($transaction->fromC),
+                    to          : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
+                    amount      : $transaction->amount,
+                    currency    : $transaction->currency,
+                    baseCurrency: $transaction->base_currency,
+                    groupId     : $transaction->group_id,
+                    groupName   : $transaction->group->name,
+                    rate        : $transaction->rate,
+                    id          : $transaction->id,
+                    status      : $transaction->status
                 );
             });
     }
@@ -48,16 +49,17 @@ class EloquentTransactionReadRepository implements TransactionReadRepositoryInte
         }
 
         return new Transaction(
-            from     : CustomerEloquentToDomainEntity::toEntity($transaction->fromC),
-            to       : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
-            amount   : $transaction->amount,
-            currency : $transaction->currency,
-            groupId  : $transaction->group_id,
-            groupName: $transaction->group->name,
-            rate     : $transaction->rate,
-            id       : $transaction->id,
-            group    : GroupEloquentToDomainEntity::toEntity($transaction->group),
-            status   : $transaction->status
+            from        : CustomerEloquentToDomainEntity::toEntity($transaction->fromC),
+            to          : CustomerEloquentToDomainEntity::toEntity($transaction->toC),
+            amount      : $transaction->amount,
+            currency    : $transaction->currency,
+            baseCurrency: $transaction->base_currency,
+            groupId     : $transaction->group_id,
+            groupName   : $transaction->group->name,
+            rate        : $transaction->rate,
+            id          : $transaction->id,
+            group       : GroupEloquentToDomainEntity::toEntity($transaction->group),
+            status      : $transaction->status
         );
     }
 

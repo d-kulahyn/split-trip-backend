@@ -19,13 +19,14 @@ class EloquentTransactionWriteRepository implements TransactionWriteRepositoryIn
         $eloquentTransaction = \App\Models\Transaction::query()->updateOrCreate(
             ['id' => $transaction->id],
             [
-                'amount'   => $transaction->amount,
-                'currency' => $transaction->currency,
-                'rate'     => $transaction->rate,
-                'from'     => $transaction->from->id,
-                'to'       => $transaction->to->id,
-                'group_id' => $transaction->groupId,
-                'status'   => $transaction->status,
+                'amount'        => $transaction->amount,
+                'currency'      => $transaction->currency,
+                'rate'          => $transaction->rate,
+                'from'          => $transaction->from->id,
+                'to'            => $transaction->to->id,
+                'group_id'      => $transaction->groupId,
+                'status'        => $transaction->status,
+                'base_currency' => $transaction->baseCurrency,
             ]
         );
 
