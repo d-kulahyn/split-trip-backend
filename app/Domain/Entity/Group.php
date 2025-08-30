@@ -225,6 +225,10 @@ class Group
         if ($debt->currency !== $transaction->currency) {
             $currencyConverterService = app(CurrencyConverterService::class);
 
+            
+            header('Content-Type: application/json');
+            echo json_encode($transaction->rate);die;
+            
             $amount = $currencyConverterService->convert(
                 $transaction->currency,
                 $transaction->amount,
